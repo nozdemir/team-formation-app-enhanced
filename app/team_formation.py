@@ -1136,13 +1136,18 @@ class ScientificTeamFormation:
                 keywords = [kw.strip() for kw in keywords.split(',') if kw.strip()]
             
             # Use build_teams method
+            # Extract parameters to avoid duplicate keyword arguments
+            max_distance = kwargs.pop('max_distance', 3)
+            initial_distance = kwargs.pop('initial_distance', 2) 
+            max_increase = kwargs.pop('max_increase', 5)
+            
             successful_teams, teams_df = self.build_teams(
                 keywords=keywords,
                 algorithm=algorithm,
                 limit=num_teams,
-                max_distance=kwargs.get('max_distance', 3),
-                initial_distance=kwargs.get('initial_distance', 2),
-                max_increase=kwargs.get('max_increase', 5),
+                max_distance=max_distance,
+                initial_distance=initial_distance,
+                max_increase=max_increase,
                 **kwargs
             )
             
