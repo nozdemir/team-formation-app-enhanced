@@ -198,54 +198,19 @@ def api_form_teams():
                 'error': f'Database connection failed: {str(tf_error)}'
             }), 500
         
-        # Form teams using the selected algorithm
+        # Form teams using the selected algorithm from ScientificTeamFormation
         logger.info(f"Starting team formation with algorithm: {algorithm}")
         try:
-            if algorithm == 'genetic':
-                logger.info("Using Genetic Algorithm")
-                teams_data = tf.genetic_algorithm(
-                    keywords=keywords,
-                    num_teams=num_teams,
-                    population_size=50,
-                    generations=100,
-                    mutation_rate=0.1
-                )
-            elif algorithm == 'simulated_annealing':
-                logger.info("Using Simulated Annealing")
-                teams_data = tf.simulated_annealing(
-                    keywords=keywords,
-                    num_teams=num_teams,
-                    initial_temperature=1000.0,
-                    cooling_rate=0.95,
-                    min_temperature=0.01
-                )
-            elif algorithm == 'random_search':
-                logger.info("Using Random Search")
-                teams_data = tf.random_search(
-                    keywords=keywords,
-                    num_teams=num_teams,
-                    iterations=1000
-                )
-            elif algorithm == 'greedy':
-                logger.info("Using Greedy Algorithm")
-                teams_data = tf.greedy_algorithm(
-                    keywords=keywords,
-                    num_teams=num_teams
-                )
-            elif algorithm == 'tabu_search':
-                logger.info("Using Tabu Search")
-                teams_data = tf.tabu_search(
-                    keywords=keywords,
-                    num_teams=num_teams,
-                    max_iterations=100,
-                    tabu_size=20
-                )
-            else:
-                logger.error(f"Unknown algorithm: {algorithm}")
-                return jsonify({
-                    'success': False, 
-                    'error': f'Unknown algorithm: {algorithm}'
-                }), 400
+            # Use the form_teams method with the appropriate algorithm code
+            teams_data = tf.form_teams(
+                algorithm=algorithm,
+                keywords=keywords,
+                team_size=5,  # Default team size
+                num_teams=num_teams,
+                max_distance=3,
+                initial_distance=2,
+                max_increase=5
+            )
             
             logger.info("Team formation completed successfully")
             logger.info(f"Teams data type: {type(teams_data)}")
@@ -265,6 +230,7 @@ def api_form_teams():
         try:
             logger.info("Processing team formation results...")
             
+            # Handle different response formats from ScientificTeamFormation
             if not teams_data:
                 logger.warning("No teams were formed")
                 return jsonify({
@@ -272,32 +238,40 @@ def api_form_teams():
                     'error': 'No teams could be formed with the given parameters. Try different keywords or fewer teams.'
                 }), 200
             
-            # Convert teams data to the expected format
-            formatted_teams = []
-            
-            if isinstance(teams_data, dict) and 'teams' in teams_data:
-                # If teams_data is a dict with 'teams' key
+            # Check if teams_data is a dict with 'teams' key or a direct list
+            if isinstance(teams_data, dict):
+                if 'teams' not in teams_data or not teams_data['teams']:
+                    error_msg = teams_data.get('message', 'No teams could be formed')
+                    logger.warning(f"Team formation failed: {error_msg}")
+                    return jsonify({
+                        'success': False,
+                        'error': error_msg
+                    }), 200
+                
                 teams_list = teams_data['teams']
-                summary = teams_data.get('summary', {})
-            elif isinstance(teams_data, (list, tuple)):
-                # If teams_data is directly a list of teams
-                teams_list = teams_data
-                summary = {}
+                statistics = teams_data.get('statistics', {})
+                algorithm_name = teams_data.get('algorithm', algorithm)
+                message = teams_data.get('message', f'{algorithm} Team Formation')
             else:
-                logger.error(f"Unexpected teams_data format: {type(teams_data)}")
-                teams_list = []
-                summary = {}
+                # Handle case where teams_data is directly a list
+                teams_list = teams_data if isinstance(teams_data, list) else []
+                statistics = {}
+                algorithm_name = algorithm
+                message = f'{algorithm} Team Formation'
             
             logger.info(f"Processing {len(teams_list)} teams...")
             
+            formatted_teams = []
             for i, team in enumerate(teams_list):
                 try:
                     formatted_team = {
-                        'team_number': i + 1,
+                        'team_number': team.get('team_number', i + 1),
                         'team_name': team.get('team_name', f'Team {i + 1}'),
                         'members': [],
                         'skills_covered': team.get('skills_covered', []),
-                        'requested_skills': team.get('missing_skills', [])
+                        'requested_skills': team.get('requested_skills', keywords),
+                        'completeness': team.get('completeness', 1.0),
+                        'status': team.get('status', 'complete')
                     }
                     
                     # Process team members
@@ -305,14 +279,20 @@ def api_form_teams():
                     for member in members:
                         if isinstance(member, dict):
                             formatted_team['members'].append({
-                                'author_name': member.get('name', member.get('author_name', 'Unknown')),
-                                'role': member.get('role', 'Member')
+                                'author_id': member.get('author_id', ''),
+                                'author_name': member.get('author_name', 'Unknown'),
+                                'expertise': member.get('expertise', ''),
+                                'role': member.get('role', 'Member'),
+                                'paper_count': member.get('paper_count', 0)
                             })
                         else:
                             # If member is just a string/name
                             formatted_team['members'].append({
+                                'author_id': '',
                                 'author_name': str(member),
-                                'role': 'Member'
+                                'expertise': '',
+                                'role': 'Member',
+                                'paper_count': 0
                             })
                     
                     formatted_teams.append(formatted_team)
@@ -330,14 +310,15 @@ def api_form_teams():
                 'teams': formatted_teams
             }
             
-            # Add summary if available
-            if summary:
+            # Add summary from response or generate default
+            response_summary = teams_data.get('summary', {}) if isinstance(teams_data, dict) else {}
+            if response_summary or formatted_teams:
                 response_data['summary'] = {
-                    'algorithm_name': summary.get('algorithm_name', algorithm.replace('_', ' ').title()),
+                    'algorithm_name': response_summary.get('algorithm_name', algorithm.replace('_', ' ').title()),
                     'keywords_requested': keywords,
-                    'success_rate': summary.get('success_rate', 'N/A'),
-                    'avg_team_size': summary.get('avg_team_size', 'N/A'),
-                    'avg_completeness': summary.get('avg_completeness', 'N/A')
+                    'success_rate': response_summary.get('success_rate', 'N/A'),
+                    'avg_team_size': response_summary.get('avg_team_size', round(sum(len(t['members']) for t in formatted_teams) / len(formatted_teams)) if formatted_teams else 0),
+                    'avg_completeness': response_summary.get('avg_completeness', round(sum(t.get('completeness', 1.0) for t in formatted_teams) / len(formatted_teams), 2) if formatted_teams else 1.0)
                 }
             
             logger.info("=== Team Formation Request Completed Successfully ===")
