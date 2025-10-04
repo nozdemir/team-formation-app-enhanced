@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Team Formation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        /* Hi */
+        /* Auto-complete specific styles */
+        .keywords-container {
+            position: relative;
+        }
+
+        .keywords-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .keywords-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .keywords-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .suggestion-item {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s ease;
+        }
+
+        .suggestion-item:hover,
+        .suggestion-item.active {
+            background-color: #f0f4ff;
+            color: #667eea;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .selected-keywords {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .keyword-tag {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .keyword-tag .remove {
+            cursor: pointer;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .keyword-tag .remove:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 30px;
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .keyword-count {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 Scientific Team Formation System</h1>
+            <p>Advanced algorithms for building optimal research teams using Neo4j database</p>
+        </div>
+
+        <div class="form-card">
+            <form id="teamFormationForm">
+                <div class="form-group">
+                    <label for="algorithm">Algorithm:</label>
+                    <select id="algorithm" name="algorithm" required>
+                        <option value="">Loading algorithms...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="keywords">Keywords (Auto-complete enabled):</label>
+                    <div class="keywords-container">
+                        <input 
+                            type="text" 
+                            id="keywords" 
+                            class="keywords-input"
+                            placeholder="Start typing to see available keywords..."
+                            autocomplete="off"
+                        >
+                        <div id="keywordsSuggestions" class="keywords-suggestions"></div>
+                    </div>
+                    <div id="selectedKeywords" class="selected-keywords"></div>
+                    <div class="keyword-count">
+                        <span id="keywordCount">0</span> keywords selected (max 10 recommended)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="numTeams">Number of Teams:</label>
+                    <input type="number" id="numTeams" name="numTeams" min="1" max="20" value="5" required>
+                </div>
+
+                <button type="submit" class="btn" id="submitBtn">
+                    Form Teams 🚀
+                </button>
+            </form>
+
+            <div id="status"></div>
+        </div>
+
+        <div id="results" class="results"></div>
+    </div>
+
+    <script>
+        // Global variables for auto-complete
+        let availableKeywords = [];
+        let selectedKeywords = [];
+        let currentSuggestionIndex = -1;
+
+        // Load algorithms and keywords on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAlgorithms();
+            loadKeywords();
+        });
+
+        // Load algorithms from API
+        async function loadAlgorithms() {
+            try {
+                const response = await fetch('/api/algorithms');
+                const algorithms = await response.json();
+                
+                const algorithmSelect = document.getElementById('algorithm');
+                algorithmSelect.innerHTML = '<option value="">Select an algorithm...</option>';
+                
+                algorithms.forEach(algo => {
+                    const option = document.createElement('option');
+                    option.value = algo.id;
+                    option.textContent = `${algo.name} - ${algo.description}`;
+                    algorithmSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading algorithms:', error);
+                showStatus('Error loading algorithms. Please refresh the page.', 'error');
+            }
+        }
+
+        // Load keywords from file for auto-complete
+        async function loadKeywords() {
+            try {
+                const response = await fetch('/api/keywords-file');
+                const data = await response.json();
+                
+                if (Array.isArray(data)) {
+                    availableKeywords = data;
+                    console.log(`Loaded ${availableKeywords.length} keywords for auto-complete`);
+                    
+                    // Show success message
+                    showStatus(`Loaded ${availableKeywords.length} keywords for auto-complete`, 'success');
+                    
+                } else if (data.fallback_keywords) {
+                    availableKeywords = data.fallback_keywords;
+                    console.warn('Using fallback keywords');
+                    showStatus('Using fallback keywords - some keywords may not be available', 'error');
+                } else {
+                    throw new Error('Invalid keywords format');
+                }
+            } catch (error) {
+                console.error('Error loading keywords:', error);
+                // Fallback keywords if file loading fails
+                availableKeywords = [
+                    "machine learning", "data mining", "optimization", "algorithms",
+                    "database systems", "software engineering", "artificial intelligence",
+                    "computer vision", "natural language processing", "deep learning"
+                ];
+                showStatus('Error loading keywords from file. Using basic keywords only.', 'error');
+            }
+        }
+
+        // Auto-complete functionality
+        const keywordsInput = document.getElementById('keywords');
+        const suggestionsList = document.getElementById('keywordsSuggestions');
+
+        keywordsInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            
+            // Require at least 2 characters before showing suggestions
+            if (query.length < 2) {
+                hideSuggestions();
+                return;
+            }
+
+            const filteredKeywords = availableKeywords
+                .filter(keyword => 
+                    keyword.toLowerCase().includes(query) && 
+                    !selectedKeywords.includes(keyword)
+                )
+                .slice(0, 10); // Limit to 10 suggestions
+
+            showSuggestions(filteredKeywords, query);
+        });
+
+        keywordsInput.addEventListener('keydown', function(e) {
+            const suggestions = suggestionsList.querySelectorAll('.suggestion-item');
+            
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                currentSuggestionIndex = Math.min(currentSuggestionIndex + 1, suggestions.length - 1);
+                updateSuggestionSelection();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                currentSuggestionIndex = Math.max(currentSuggestionIndex - 1, -1);
+                updateSuggestionSelection();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (currentSuggestionIndex >= 0 && suggestions[currentSuggestionIndex]) {
+                    selectKeyword(suggestions[currentSuggestionIndex].textContent);
+                }
+            } else if (e.key === 'Escape') {
+                hideSuggestions();
+            }
+        });
+
+        function showSuggestions(keywords, query) {
+            suggestionsList.innerHTML = '';
+            currentSuggestionIndex = -1;
+
+            if (keywords.length === 0) {
+                suggestionsList.style.display = 'none';
+                return;
+            }
+
+            keywords.forEach((keyword, index) => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                
+                // Highlight matching text
+                const regex = new RegExp(`(${query})`, 'gi');
+                const highlightedText = keyword.replace(regex, '<strong>$1</strong>');
+                item.innerHTML = highlightedText;
+                
+                item.addEventListener('click', () => selectKeyword(keyword));
+                suggestionsList.appendChild(item);
+            });
+
+            suggestionsList.style.display = 'block';
+        }
+
+        function hideSuggestions() {
+            suggestionsList.style.display = 'none';
+            currentSuggestionIndex = -1;
+        }
+
+        function updateSuggestionSelection() {
+            const suggestions = suggestionsList.querySelectorAll('.suggestion-item');
+            suggestions.forEach((item, index) => {
+                item.classList.toggle('active', index === currentSuggestionIndex);
+            });
+        }
+
+        function selectKeyword(keyword) {
+            if (!selectedKeywords.includes(keyword) && selectedKeywords.length < 10) {
+                selectedKeywords.push(keyword);
+                updateSelectedKeywords();
+                keywordsInput.value = '';
+                hideSuggestions();
+            }
+        }
+
+        function removeKeyword(keyword) {
+            selectedKeywords = selectedKeywords.filter(k => k !== keyword);
+            updateSelectedKeywords();
+        }
+
+        function updateSelectedKeywords() {
+            const container = document.getElementById('selectedKeywords');
+            const countElement = document.getElementById('keywordCount');
+            
+            container.innerHTML = '';
+            
+            selectedKeywords.forEach(keyword => {
+                const tag = document.createElement('div');
+                tag.className = 'keyword-tag';
+                tag.innerHTML = `
+                    <span>${keyword}</span>
+                    <span class="remove" onclick="removeKeyword('${keyword}')">&times;</span>
+                `;
+                container.appendChild(tag);
+            });
+
+            countElement.textContent = selectedKeywords.length;
+        }
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.keywords-container')) {
+                hideSuggestions();
+            }
+        });
+
+        // Form submission
+        document.getElementById('teamFormationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (selectedKeywords.length === 0) {
+                showStatus('Please select at least one keyword.', 'error');
+                return;
+            }
+
+            const algorithm = document.getElementById('algorithm').value;
+            const numTeams = parseInt(document.getElementById('numTeams').value);
+            
+            if (!algorithm) {
+                showStatus('Please select an algorithm.', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            const resultsDiv = document.getElementById('results');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '🔄 Forming Teams...';
+            
+            // Show loading in results area ...
+            resultsDiv.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Forming teams using ${algorithm.replace('_', ' ')} algorithm...</p>
+                    <p>Keywords: ${selectedKeywords.join(', ')}</p>
+                </div>
+            `;
+            resultsDiv.style.display = 'block';
+
+            try {
+                console.log('Sending request:', {
+                    algorithm: algorithm,
+                    keywords: selectedKeywords,
+                    num_teams: numTeams
+                });
+
+                const response = await fetch('/api/form-teams', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        algorithm: algorithm,
+                        keywords: selectedKeywords,
+                        num_teams: numTeams
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+
+                let data;
+                const contentType = response.headers.get('content-type');
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                    console.log('Response data:', data);
+                } else {
+                    // If response is not JSON, get it as text for debugging
+                    const textResponse = await response.text();
+                    console.error('Non-JSON response:', textResponse);
+                    throw new Error(`Server returned non-JSON response (${response.status}): ${textResponse.substring(0, 200)}...`);
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${data.error || 'Unknown server error'}`);
+                }
+
+                displayResults(data);
+                showStatus('Teams formed successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error details:', error);
+                
+                let errorMessage = 'An unexpected error occurred.';
+                
+                if (error.message.includes('HTTP 500')) {
+                    errorMessage = 'Server error: Please check the server logs for more details. The issue might be with the database connection or algorithm execution.';
+                } else if (error.message.includes('HTTP 400')) {
+                    errorMessage = 'Invalid request: Please check your input parameters.';
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMessage = 'Network error: Please check your internet connection and try again.';
+                } else {
+                    errorMessage = error.message;
+                }
+                
+                showStatus(`❌ Team formation failed: ${errorMessage}`, 'error');
+                
+                // Show error in results area
+                resultsDiv.innerHTML = `
+                    <div style="background-color: #f8d7da; color: #721c24; padding: 20px; border-radius: 5px; border: 1px solid #f5c6cb;">
+                        <h3>❌ Error Details</h3>
+                        <p><strong>Error:</strong> ${errorMessage}</p>
+                        <p><strong>Parameters:</strong></p>
+                        <ul>
+                            <li>Algorithm: ${algorithm}</li>
+                            <li>Keywords: ${selectedKeywords.join(', ')}</li>
+                            <li>Number of Teams: ${numTeams}</li>
+                        </ul>
+                        <p><strong>Suggestions:</strong></p>
+                        <ul>
+                            <li>Try using fewer keywords</li>
+                            <li>Try requesting fewer teams</li>
+                            <li>Check the browser console (F12) for more details</li>
+                            <li>Contact the system administrator if the problem persists</li>
+                        </ul>
+                    </div>
+                `;
+                
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Form Teams 🚀';
+            }
+        });
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function displayResults(data) {
+            const results = document.getElementById('results');
+            
+            if (!data.success) {
+                results.innerHTML = `<div class="error">${data.error || 'Failed to form teams'}</div>`;
+                return;
+            }
+
+            let html = `<div class="success">
+                Successfully formed ${data.total_teams} team(s) using ${data.summary?.algorithm_name || data.algorithm}
+            </div>`;
+
+            if (data.summary) {
+                html += `
+                <div style="background-color: #3498db; color: white; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                    <h3 style="margin-top: 0;">📊 Summary</h3>
+                    <p><strong>Keywords:</strong> ${data.summary.keywords_requested.join(', ')}</p>
+                    <p><strong>Success Rate:</strong> ${data.summary.success_rate}</p>
+                    <p><strong>Average Team Size:</strong> ${data.summary.avg_team_size}</p>
+                    <p><strong>Average Completeness:</strong> ${data.summary.avg_completeness}%</p>
+                </div>`;
+            }
+
+            if (data.teams && data.teams.length > 0) {
+                data.teams.forEach(team => {
+                    html += `
+                    <div class="team">
+                        <h3>${team.team_name || `Team ${team.team_number}`}</h3>
+                        <div class="member">
+                            <strong>Members:</strong>
+                            <ul style="padding-left: 20px;">
+                                ${team.members.map(member => `
+                                    <li>${member.author_name || 'Unknown Author'} (${member.role || 'Member'})</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        <div class="member">
+                            <strong>Keywords Covered:</strong>
+                            <div>${team.skills_covered.map(skill => 
+                                `<span class="keyword-tag">${skill}</span>`
+                            ).join(' ')}</div>
+                        </div>
+                        ${team.requested_skills && team.requested_skills.length > 0 ? `
+                        <div class="member">
+                            <strong>Requested Skills:</strong>
+                            <div>${team.requested_skills.map(skill => 
+                                `<span class="keyword-tag" style="background-color: #e74c3c;">${skill}</span>`
+                            ).join(' ')}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    `;
+                });
+            } else {
+                html += `<div class="error">No teams found</div>`;
+            }
+
+            results.innerHTML = html;
+            results.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

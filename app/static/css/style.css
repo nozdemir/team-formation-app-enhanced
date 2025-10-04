@@ -1,0 +1,42 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+}
+
+.navbar {
+    background-color: #007bff;
+    color: white;
+    padding: 1rem;
+}
+
+.container {
+    margin: 2rem auto;
+    max-width: 800px;
+}
+
+h1 {
+    color: #343a40;
+}
+
+.card {
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: #007bff;
+    color: white;
+}
+
+.table {
+    margin-top: 1rem;
+}
+
+.badge {
+    font-size: 0.9rem;
+}
+
+.btn {
+    margin-top: 1rem;
+}
