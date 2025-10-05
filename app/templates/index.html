@@ -15,7 +15,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
         }
 
@@ -639,28 +639,28 @@
             let html = `
                 <div class="formatted-results">
                     <!-- Summary Section with Blue Background -->
-                    <div class="card mb-4" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); border: none; color: white;">
+                    <div class="card mb-4" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: none; color: white; box-shadow: 0 8px 25px rgba(0,0,0,0.15);">
                         <div class="card-body text-center">
                             <h2 class="mb-3"><i class="fas fa-users"></i> Team Formation Results</h2>
                             <div class="row">
                                 <div class="col-md-3">
-                                    <h4 class="text-warning">${totalTeams}</h4>
+                                    <h4 style="color: #87ceeb;">${totalTeams}</h4>
                                     <small>Total Teams</small>
                                 </div>
                                 <div class="col-md-3">
-                                    <h4 class="text-success">${completeTeams}</h4>
+                                    <h4 style="color: #90ee90;">${completeTeams}</h4>
                                     <small>Complete Teams</small>
                                 </div>
                                 <div class="col-md-3">
-                                    <h4 class="text-light">${incompleteTeams}</h4>
+                                    <h4 style="color: #ffb6c1;">${incompleteTeams}</h4>
                                     <small>Incomplete Teams</small>
                                 </div>
                                 <div class="col-md-3">
-                                    <h4 class="text-info">${formationTime}s</h4>
+                                    <h4 style="color: #ffffff;">${formationTime}s</h4>
                                     <small>Formation Time</small>
                                 </div>
                             </div>
-                            <hr class="bg-light">
+                            <hr style="border-color: rgba(255,255,255,0.3);">
                             <div class="row mt-3">
                                 <div class="col-md-4">
                                     <strong>Algorithm:</strong> ${data.summary?.algorithm_name || data.algorithm}
@@ -733,34 +733,22 @@
                 
                 // Add Google Forms integration
                 html += `
-                <div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #f0fff4 0%, #f8fff9 100%); border: 2px solid #28a745; border-radius: 10px; text-align: center;">
-                    <h4 style="color: #28a745; margin-bottom: 15px;">
-                        <i class="fas fa-chart-line"></i> Help Us Improve - Evaluate This Team Formation
+                <div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%); border: 2px solid #2a5298; border-radius: 10px; text-align: center;">
+                    <h4 style="margin-bottom: 15px;">
+                        <a href="#" onclick="showEmbeddedForm(); return false;" style="color: #2a5298; text-decoration: none;">
+                            <i class="fas fa-chart-line"></i> Help Us Improve - Evaluate This Team Formation
+                        </a>
                     </h4>
-                    <p style="margin-bottom: 20px; color: #155724;">
-                        <strong>Your feedback is valuable for our scientific research.</strong><br>
-                        Please take 2-3 minutes to evaluate the team formation results.
+                    <p style="margin-bottom: 20px; color: #1e3c72;">
+                        <strong>Your feedback is valuable for our scientific research.</strong>
                     </p>
                     
-                    <button onclick="copyTeamResults()" class="btn btn-outline-primary" style="padding: 10px 20px; margin: 5px; background-color: transparent; color: #007bff; border: 1px solid #007bff; border-radius: 5px; cursor: pointer;">
-                        <i class="fas fa-copy"></i> Copy Results
-                    </button>
-                    
-                    <a href="/about" class="btn btn-info" style="display: inline-block; padding: 10px 20px; margin: 5px; background-color: #17a2b8; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                    <a href="/about" class="btn btn-info" style="display: inline-block; padding: 10px 20px; margin: 5px; background-color: #2a5298; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
                         <i class="fas fa-info-circle"></i> About ONLEVAL
                     </a>
                     
-                    <div style="margin-top: 15px;">
-                        <small style="color: #666;">
-                            Please provide your feedback: 
-                            <a href="#" onclick="showEmbeddedForm(); return false;" style="color: #28a745;">
-                                Click here to open feedback form below
-                            </a>
-                        </small>
-                    </div>
-                    
-                    <div id="embeddedFormContainer" style="display: none; margin-top: 20px;">
-                        <hr>
+                    <div id="embeddedFormContainer" style="margin-top: 20px;">
+                        <hr style="border-color: #2a5298;">
                         <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfjqhqiC3mDT3UU2R5oupe08Kr5ESuNTseKPQbEbwjPMumnRw/viewform?embedded=true" 
                                 width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">
                             Loading feedback form...
