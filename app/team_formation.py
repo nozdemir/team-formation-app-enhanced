@@ -1084,50 +1084,6 @@ class ScientificTeamFormation:
 
     # ==================== WEB INTERFACE COMPATIBILITY METHODS ====================
     
-    def form_team(self, keywords, algorithm="ACET", team_size=5, **kwargs):
-        """Single team formation method for web interface compatibility"""
-        try:
-            # Convert to list if needed
-            if isinstance(keywords, str):
-                keywords = [kw.strip() for kw in keywords.split(',') if kw.strip()]
-            
-            # Use build_teams to form one team
-            successful_teams, teams_df = self.build_teams(
-                keywords=keywords,
-                algorithm=algorithm,
-                limit=1,
-                max_distance=kwargs.get('max_distance', 3),
-                initial_distance=kwargs.get('initial_distance', 2),
-                max_increase=kwargs.get('max_increase', 5),
-                **kwargs
-            )
-            
-            if successful_teams > 0 and not teams_df.empty:
-                # Convert DataFrame to web-compatible format
-                team_members = []
-                for _, row in teams_df.iterrows():
-                    team_members.append({
-                        "author_id": str(row.get('Author ID', '')),
-                        "author_name": str(row.get('Author Name', 'Unknown')),
-                        "expertise": str(row.get('Matching Skills', '')),
-                        "role": str(row.get('Added For Skill', 'Team Member')),
-                        "paper_count": 0
-                    })
-                
-                return {
-                    "team_number": 1,
-                    "algorithm": algorithm,
-                    "members": team_members,
-                    "skills_covered": keywords,
-                    "requested_skills": keywords,
-                    "completeness": 1.0 if successful_teams > 0 else 0.7
-                }
-            
-            return None
-        except Exception as e:
-            logger.error(f"Error in form_team: {e}")
-            return None
-
     def form_teams(self, algorithm, keywords, team_size=5, num_teams=3, **kwargs):
         """Multiple teams formation method for web interface compatibility"""
         try:

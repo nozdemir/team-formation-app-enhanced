@@ -40,3 +40,38 @@ h1 {
 .btn {
     margin-top: 1rem;
 }
+
+/* Formatted results styling */
+.formatted-results {
+    font-family: 'Courier New', monospace;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    line-height: 1.6;
+}
+
+.formatted-results h2, .formatted-results h4, .formatted-results h5 {
+    color: #2c3e50;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.formatted-results p {
+    margin-bottom: 8px;
+}
+
+.team-section {
+    background-color: #f8f9fa;
+    margin: 20px 0;
+    padding: 15px;
+    border-left: 4px solid #007bff;
+}
+
+.team-section.complete {
+    border-left-color: #28a745;
+}
+
+.team-section.incomplete {
+    border-left-color: #ffc107;
+}
