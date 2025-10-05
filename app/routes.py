@@ -267,19 +267,31 @@ def api_form_teams():
                         'requested_skills': team.get('missing_skills', [])
                     }
                     
-                    # Process team members
+                    # Process team members with enhanced details
                     members = team.get('members', [])
                     for member in members:
                         if isinstance(member, dict):
                             formatted_team['members'].append({
-                                'author_name': member.get('name', member.get('author_name', 'Unknown')),
-                                'role': member.get('role', 'Member')
+                                'author_name': member.get('author_name', member.get('name', 'Unknown')),
+                                'role': member.get('role', 'Member'),
+                                'added_for': member.get('added_for', 'Team Member'),
+                                'skills': member.get('skills', 'No skills data available'),
+                                'paper_count': member.get('paper_count', 0),
+                                'organizations': member.get('organizations', 'No organization data'),
+                                'total_citations': member.get('total_citations', 0),
+                                'expertise': member.get('expertise', 'General expertise')
                             })
                         else:
                             # If member is just a string/name
                             formatted_team['members'].append({
                                 'author_name': str(member),
-                                'role': 'Member'
+                                'role': 'Member',
+                                'added_for': 'Team Member',
+                                'skills': 'Data unavailable',
+                                'paper_count': 0,
+                                'organizations': 'Data unavailable',
+                                'total_citations': 0,
+                                'expertise': 'General expertise'
                             })
                     
                     formatted_teams.append(formatted_team)

@@ -135,9 +135,11 @@ function displayResults(data) {
                 const name = member.author_name || member.name || 'Unknown';
                 const id = member.author_id || member.id || '';
                 const addedFor = member.added_for || member.role || 'Team Member';
-                const allSkills = member.all_skills || member.expertise || 'No skills data';
+                const allSkills = member.skills || member.all_skills || member.expertise || 'No skills data';
                 const paperCount = member.paper_count || 0;
-                const organizations = member.organizations || [];
+                const organizations = typeof member.organizations === 'string' ? 
+                    member.organizations.split(',').map(s => s.trim()).filter(s => s) : 
+                    (member.organizations || []);
                 const totalCitations = member.total_citations || 0;
                 
                 html += `
@@ -189,14 +191,21 @@ function displayResults(data) {
                             <div class="mt-1">
                     `;
                     organizations.slice(0, 3).forEach(org => { // Show max 3 organizations
-                        if (org) {
-                            html += `<span class="badge bg-success me-1 mb-1">${org}</span>`;
+                        if (org && org.trim()) {
+                            html += `<span class="badge bg-success me-1 mb-1">${org.trim()}</span>`;
                         }
                     });
                     if (organizations.length > 3) {
                         html += `<span class="badge bg-secondary">+${organizations.length - 3} more</span>`;
                     }
                     html += `</div></div>`;
+                } else {
+                    html += `
+                        <div class="mb-2">
+                            <strong>Organizations:</strong>
+                            <span class="text-muted">No organization data</span>
+                        </div>
+                    `;
                 }
                 
                 html += `

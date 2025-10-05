@@ -909,15 +909,13 @@ class ScientificTeamFormation:
         MATCH (a:Author)
         WHERE a.Author_ID IN $author_ids
         
-        // Get paper count and citation count
+        // Get paper count and total citation count for all papers
         OPTIONAL MATCH (a)-[:WRITTEN]->(p:Paper)
         WITH a, COUNT(DISTINCT p) as paper_count, SUM(COALESCE(p.n_Citation, 0)) AS total_citations
         
-        // Get organizations and departments
+        // Get all organizational affiliations (both direct and through departments)
         OPTIONAL MATCH (a)-[:WORKS_IN]->(org:Organization)
         OPTIONAL MATCH (a)-[:WORKS_IN]->(dept:Department)
-        
-        // Also check for organizations through departments
         OPTIONAL MATCH (a)-[:WORKS_IN]->(dept2:Department)<-[:INCLUDES]-(parent_org:Organization)
         
         WITH a, paper_count, total_citations,
@@ -939,42 +937,59 @@ class ScientificTeamFormation:
             enhanced_details = []
             
             for record in result:
+                # Process skills - clean up and format properly
                 skills_str = record['skills'] or ''
-                # Clean up skills string and make it more readable
                 if skills_str:
-                    # Remove extra quotes and clean up the skills
-                    skills_str = skills_str.replace('"', '').replace("'", "")
-                    # Split by common separators and clean
+                    # Remove quotes and clean up
+                    skills_str = skills_str.replace('"', '').replace("'", "").strip()
+                    # Handle various separators
                     if ',' in skills_str:
                         skills_list = [s.strip() for s in skills_str.split(',') if s.strip()]
-                        skills_str = ', '.join(skills_list)
                     elif ';' in skills_str:
                         skills_list = [s.strip() for s in skills_str.split(';') if s.strip()]
-                        skills_str = ', '.join(skills_list)
+                    else:
+                        skills_list = [skills_str] if skills_str else []
+                    
+                    # Clean and join skills
+                    cleaned_skills = [s for s in skills_list if len(s) > 1]
+                    skills_str = ', '.join(cleaned_skills) if cleaned_skills else 'No specific skills listed'
+                else:
+                    skills_str = 'No skills data available'
+                
+                # Process organizations - clean up the list
+                organizations = record['organizations'] or []
+                cleaned_orgs = []
+                for org in organizations:
+                    if org and org.strip() and len(org.strip()) > 1:
+                        cleaned_orgs.append(org.strip())
                 
                 author_detail = {
                     'author_id': record['author_id'],
                     'author_name': record['author_name'],
-                    'all_skills': skills_str if skills_str else 'No specific skills listed',
+                    'skills': skills_str,  # Keep it as 'skills' for consistency
                     'paper_count': record['paper_count'],
-                    'organizations': record['organizations'],
+                    'organizations': cleaned_orgs,
                     'total_citations': record['total_citations']
                 }
                 enhanced_details.append(author_detail)
                 
             logger.info(f"Retrieved enhanced details for {len(enhanced_details)} authors")
             return enhanced_details
+            
         except Exception as e:
             logger.error(f"Error in get_enhanced_member_details: {e}")
             # Return basic structure even on error
-            return [{
-                'author_id': aid,
-                'author_name': f'Author {aid}',
-                'all_skills': 'Data unavailable',
-                'paper_count': 0,
-                'organizations': [],
-                'total_citations': 0
-            } for aid in author_ids]
+            fallback_details = []
+            for aid in author_ids:
+                fallback_details.append({
+                    'author_id': aid,
+                    'author_name': f'Author {aid}',
+                    'skills': 'Data unavailable',
+                    'paper_count': 0,
+                    'organizations': [],
+                    'total_citations': 0
+                })
+            return fallback_details
 
     def find_matching_skills(self, skills_str: str, keywords: List[str]) -> List[str]:
         """Find skills from an author that match any of the required keywords."""
@@ -1168,11 +1183,52 @@ class ScientificTeamFormation:
             if isinstance(keywords, str):
                 keywords = [kw.strip() for kw in keywords.split(',') if kw.strip()]
             
+            logger.info(f"=== TEAM FORMATION DEBUG START ===")
+            logger.info(f"Algorithm: {algorithm}")
+            logger.info(f"Keywords: {keywords}")
+            logger.info(f"Requested teams: {num_teams}")
+            
+            # Debug: Test basic database connectivity
+            try:
+                with self.driver.session() as session:
+                    test_result = session.run("MATCH (a:Author) RETURN count(a) as total_authors LIMIT 1")
+                    author_count = test_result.single()["total_authors"]
+                    logger.info(f"Database connectivity test: Found {author_count} total authors")
+                    
+                    # Test keyword search
+                    test_keyword_query = """
+                    MATCH (a:Author)
+                    WHERE (a.skills IS NOT NULL AND toLower(a.skills) CONTAINS toLower($keyword))
+                    OR EXISTS {
+                        MATCH (a)-[:WRITTEN]->(p:Paper)
+                        WHERE toLower(p.Combined_Keywords) CONTAINS toLower($keyword)
+                    }
+                    RETURN a.Author_ID, a.Author_Name, a.skills
+                    LIMIT 5
+                    """
+                    
+                    test_result = session.run(test_keyword_query, keyword=keywords[0])
+                    test_authors = list(test_result)
+                    logger.info(f"Test search for '{keywords[0]}' found {len(test_authors)} authors")
+                    for author in test_authors[:3]:
+                        logger.info(f"  - {author['a.Author_Name']}: {author['a.skills']}")
+                        
+            except Exception as db_error:
+                logger.error(f"Database connectivity issue: {db_error}")
+                return {
+                    "teams": [],
+                    "algorithm": algorithm,
+                    "message": f"Database connectivity error: {str(db_error)}",
+                    "statistics": {"total_teams": 0, "total_members": 0, "keyword_coverage": 0}
+                }
+            
             # Use build_teams method
             # Extract parameters to avoid duplicate keyword arguments
             max_distance = kwargs.pop('max_distance', 3)
             initial_distance = kwargs.pop('initial_distance', 2) 
             max_increase = kwargs.pop('max_increase', 5)
+            
+            logger.info(f"Calling build_teams with max_distance={max_distance}, initial_distance={initial_distance}")
             
             successful_teams, teams_df = self.build_teams(
                 keywords=keywords,
@@ -1183,6 +1239,8 @@ class ScientificTeamFormation:
                 max_increase=max_increase,
                 **kwargs
             )
+            
+            logger.info(f"build_teams returned: successful_teams={successful_teams}, teams_df shape={teams_df.shape if not teams_df.empty else 'EMPTY'}")
             
             teams = []
             if successful_teams > 0 and not teams_df.empty:
@@ -1212,19 +1270,22 @@ class ScientificTeamFormation:
                             
                             # Get enhanced details for this member
                             enhanced_detail = details_map.get(author_id, {})
-                            all_skills = enhanced_detail.get('skills', '')
+                            member_skills = enhanced_detail.get('skills', 'No skills data available')
                             paper_count = enhanced_detail.get('paper_count', 0)
                             organizations = enhanced_detail.get('organizations', [])
                             total_citations = enhanced_detail.get('total_citations', 0)
                             
+                            # Format organizations display
+                            org_display = ', '.join(organizations) if organizations else 'No organization data'
+                            
                             members.append({
                                 "author_id": author_id,
                                 "author_name": author_name,
-                                "expertise": matching_skills,
+                                "expertise": matching_skills if matching_skills and matching_skills != 'nan' else 'General expertise',
                                 "added_for": added_for_skill,
-                                "all_skills": all_skills,
+                                "skills": member_skills,  # All skills from database
                                 "paper_count": paper_count,
-                                "organizations": organizations,
+                                "organizations": org_display,
                                 "total_citations": total_citations,
                                 "role": added_for_skill
                             })
