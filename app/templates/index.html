@@ -713,10 +713,18 @@
                     <div style="margin-top: 15px;">
                         <small style="color: #666;">
                             Please provide your feedback: 
-                            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfjqhqiC3mDT3UU2R5oupe08Kr5ESuNTseKPQbEbwjPMumnRw/viewform" target="_blank" style="color: #28a745;">
-                                Click here to open feedback form
+                            <a href="#" onclick="showEmbeddedForm(); return false;" style="color: #28a745;">
+                                Click here to open feedback form below
                             </a>
                         </small>
+                    </div>
+                    
+                    <div id="embeddedFormContainer" style="display: none; margin-top: 20px;">
+                        <hr>
+                        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfjqhqiC3mDT3UU2R5oupe08Kr5ESuNTseKPQbEbwjPMumnRw/viewform?embedded=true" 
+                                width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">
+                            Loading feedback form...
+                        </iframe>
                     </div>
                 </div>`;
             } else {
