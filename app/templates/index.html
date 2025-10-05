@@ -621,367 +621,174 @@
                 return;
             }
 
-            const teams = data.teams || [];
-            const summary = data.summary || {};
-            
-            if (teams.length === 0) {
-                resultsDiv.innerHTML = '<div class="alert alert-warning">No teams could be formed with the given criteria.</div>';
-                return;
+            let html = `<div class="success">
+                Successfully formed ${data.total_teams} team(s) using ${data.summary?.algorithm_name || data.algorithm}
+            </div>`;
+
+            if (data.summary) {
+                html += `
+                <div style="background-color: #3498db; color: white; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                    <h3 style="margin-top: 0;">📊 Summary</h3>
+                    <p><strong>Keywords:</strong> ${data.summary.keywords_requested.join(', ')}</p>
+                    <p><strong>Success Rate:</strong> ${data.summary.success_rate}</p>
+                    <p><strong>Average Team Size:</strong> ${data.summary.avg_team_size}</p>
+                    <p><strong>Average Completeness:</strong> ${data.summary.avg_completeness}%</p>
+                </div>`;
             }
 
-            // Calculate statistics
-            const totalTeams = teams.length;
-            const completeTeams = teams.filter(t => (t.completeness || 1) >= 1.0).length;
-            const avgTeamSize = teams.reduce((sum, t) => sum + (t.members || []).length, 0) / totalTeams;
-            const avgCompleteness = teams.reduce((sum, t) => sum + (t.completeness || 1), 0) / totalTeams * 100;
-            
-            let html = `
-                <!-- Bootstrap CSS for enhanced display -->
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-                
-                <div class="formatted-results">
-                    <div class="alert alert-success">
-                        <h2><i class="fas fa-check-circle"></i> Team Formation Results</h2>
-                        <p><strong>Successfully formed ${totalTeams} teams using ${summary.algorithm_name || data.algorithm}</strong></p>
-                    </div>
-                    
-                    <!-- Summary Statistics -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h4><i class="fas fa-chart-bar"></i> Team Formation Summary</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row text-center">
-                                <div class="col-md-3">
-                                    <h4 class="text-primary">${totalTeams}</h4>
-                                    <small>Teams Formed</small>
-                                </div>
-                                <div class="col-md-3">
-                                    <h4 class="text-success">${teams.reduce((sum, t) => sum + (t.members || []).length, 0)}</h4>
-                                    <small>Total Members</small>
-                                </div>
-                                <div class="col-md-3">
-                                    <h4 class="text-info">${summary.algorithm_name || data.algorithm}</h4>
-                                    <small>Algorithm Used</small>
-                                </div>
-                                <div class="col-md-3">
-                                    <h4 class="text-warning">${avgCompleteness.toFixed(1)}%</h4>
-                                    <small>Success Rate</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-            `;
-            
-            // Display each team with enhanced details
-            teams.forEach((team, index) => {
-                const teamNumber = team.team_number || index + 1;
-                const members = team.members || [];
-                const completeness = team.completeness || 1;
-                const skillsCovered = team.skills_covered || [];
-                const requestedSkills = team.requested_skills || summary.keywords_requested || [];
-                
-                const isComplete = completeness >= 1.0;
-                const emoji = isComplete ? '✅' : '⚠️';
-                const status = isComplete ? 'Complete' : 'Incomplete';
-                
-                html += `
-                    <div class="card team-card mb-4 shadow-sm">
-                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">${emoji} Team ${teamNumber}</h5>
-                            <span class="badge bg-${isComplete ? 'success' : 'warning'}">${status}</span>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-lg-8">
-                                    <h6><i class="fas fa-user-friends"></i> Team Members (${members.length})</h6>
-                                    <div class="row">
-                `;
-                
-                // Enhanced member display
-                members.forEach(member => {
-                    const name = member.author_name || member.name || 'Unknown';
-                    const addedFor = member.added_for || member.role || 'Team Member';
-                    const allSkills = member.all_skills || member.expertise || 'No skills data';
-                    const paperCount = member.paper_count || 0;
-                    const organizations = member.organizations || [];
-                    const totalCitations = member.total_citations || 0;
-                    
+            if (data.teams && data.teams.length > 0) {
+                data.teams.forEach(team => {
+                    const members = team.members || [];
                     html += `
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100" style="border-left: 4px solid #007bff;">
-                                <div class="card-body p-3">
-                                    <h6 class="text-primary mb-2">
-                                        <i class="fas fa-user"></i> ${name}
-                                    </h6>
-                                    
-                                    <div class="mb-2">
-                                        <strong>Added For:</strong>
-                                        <span class="badge bg-info">${addedFor}</span>
-                                    </div>
-                                    
-                                    <div class="mb-2">
-                                        <strong>Skills:</strong>
-                                        <div class="mt-1">
-                    `;
+                    <div class="team">
+                        <h3>${team.team_name || `Team ${team.team_number}`}</h3>
+                        <div class="member">
+                            <strong>Members:</strong>
+                            <ul style="padding-left: 20px;">`;
                     
-                    // Display skills as badges
-                    if (allSkills && allSkills !== 'No skills data') {
-                        const skillsArray = allSkills.split(',').map(s => s.trim()).filter(s => s);
-                        skillsArray.slice(0, 5).forEach(skill => { // Show max 5 skills
-                            html += `<span class="badge bg-light text-dark me-1 mb-1">${skill}</span>`;
-                        });
-                        if (skillsArray.length > 5) {
-                            html += `<span class="badge bg-secondary">+${skillsArray.length - 5} more</span>`;
-                        }
-                    } else {
-                        html += `<span class="text-muted">No skills data</span>`;
-                    }
-                    
-                    html += `
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mb-2">
-                                        <strong>Number of Papers:</strong>
-                                        <span class="badge bg-secondary">${paperCount}</span>
-                                    </div>
-                    `;
-                    
-                    // Display organizations
-                    if (organizations && organizations.length > 0) {
+                    // Enhanced member display with detailed information
+                    members.forEach(member => {
+                        const name = member.author_name || 'Unknown Author';
+                        const role = member.role || 'Member';
+                        const addedFor = member.added_for || role;
+                        const skills = member.all_skills || 'No skills data';
+                        const papers = member.paper_count || 0;
+                        const organizations = member.organizations || [];
+                        const citations = member.total_citations || 0;
+                        
                         html += `
-                            <div class="mb-2">
-                                <strong>Organizations:</strong>
-                                <div class="mt-1">
-                        `;
-                        organizations.slice(0, 3).forEach(org => { // Show max 3 organizations
-                            if (org) {
-                                html += `<span class="badge bg-success me-1 mb-1">${org}</span>`;
-                            }
-                        });
-                        if (organizations.length > 3) {
-                            html += `<span class="badge bg-secondary">+${organizations.length - 3} more</span>`;
-                        }
-                        html += `</div></div>`;
+                                <li style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                    <strong>${name}</strong> (${role})<br>
+                                    <strong>Added For:</strong> <span style="background-color: #e3f2fd; padding: 2px 6px; border-radius: 3px;">${addedFor}</span><br>
+                                    <strong>Skills:</strong> ${skills}<br>
+                                    <strong>Number of Papers:</strong> ${papers}<br>
+                                    <strong>Organizations:</strong> ${organizations.join(', ') || 'N/A'}<br>
+                                    <strong>Total Citations:</strong> ${citations}
+                                </li>`;
+                    });
+                    
+                    html += `
+                            </ul>
+                        </div>
+                        <div class="member">
+                            <strong>Keywords Covered:</strong>
+                            <div>${team.skills_covered.map(skill => 
+                                `<span class="keyword-tag">${skill}</span>`
+                            ).join(' ')}</div>
+                        </div>`;
+                        
+                    if (team.requested_skills && team.requested_skills.length > 0) {
+                        html += `
+                        <div class="member">
+                            <strong>Requested Skills:</strong>
+                            <div>${team.requested_skills.map(skill => 
+                                `<span class="keyword-tag" style="background-color: #e74c3c;">${skill}</span>`
+                            ).join(' ')}</div>
+                        </div>`;
                     }
                     
                     html += `
-                                    <div class="mb-1">
-                                        <strong>Total Citations:</strong>
-                                        <span class="badge bg-warning text-dark">${totalCitations}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
+                    </div>`;
                 });
                 
-                // Team statistics
-                const totalPapers = members.reduce((sum, m) => sum + (m.paper_count || 0), 0);
-                const totalTeamCitations = members.reduce((sum, m) => sum + (m.total_citations || 0), 0);
-                
+                // Add Google Forms integration
                 html += `
-                                    </div>
-                                </div>
-                                
-                                <div class="col-lg-4">
-                                    <h6><i class="fas fa-chart-pie"></i> Team Statistics</h6>
-                                    
-                                    <div class="card mb-3">
-                                        <div class="card-body p-3">
-                                            <h6 class="card-title">Skills Coverage</h6>
-                `;
-                
-                if (skillsCovered.length > 0) {
-                    skillsCovered.forEach(skill => {
-                        html += `<span class="badge bg-success me-1 mb-1">${skill}</span>`;
-                    });
-                } else {
-                    html += `<small class="text-muted">No skills covered information</small>`;
-                }
-                
-                html += `
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="card mb-3">
-                                        <div class="card-body p-3">
-                                            <h6 class="card-title">Requested Skills</h6>
-                `;
-                
-                if (requestedSkills.length > 0) {
-                    requestedSkills.forEach(skill => {
-                        html += `<span class="badge bg-primary me-1 mb-1">${skill}</span>`;
-                    });
-                }
-                
-                html += `
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="card">
-                                        <div class="card-body p-3">
-                                            <h6 class="card-title">Team Metrics</h6>
-                                            <div class="row text-center">
-                                                <div class="col-6">
-                                                    <h5 class="text-info">${members.length}</h5>
-                                                    <small>Members</small>
-                                                </div>
-                                                <div class="col-6">
-                                                    <h5 class="text-success">${totalPapers}</h5>
-                                                    <small>Total Papers</small>
-                                                </div>
-                                            </div>
-                                            <div class="row text-center mt-2">
-                                                <div class="col-12">
-                                                    <h5 class="text-warning">${totalTeamCitations}</h5>
-                                                    <small>Total Citations</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #f0fff4 0%, #f8fff9 100%); border: 2px solid #28a745; border-radius: 10px; text-align: center;">
+                    <h4 style="color: #28a745; margin-bottom: 15px;">
+                        <i class="fas fa-chart-line"></i> Help Us Improve - Evaluate This Team Formation
+                    </h4>
+                    <p style="margin-bottom: 20px; color: #155724;">
+                        <strong>Your feedback is valuable for our scientific research.</strong><br>
+                        Please take 2-3 minutes to evaluate the team formation results.
+                    </p>
+                    
+                    <button onclick="openFeedbackForm()" class="btn btn-success" style="padding: 10px 20px; margin: 5px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <i class="fas fa-clipboard-list"></i> Provide Feedback
+                    </button>
+                    
+                    <button onclick="copyTeamResults()" class="btn btn-outline-primary" style="padding: 10px 20px; margin: 5px; background-color: transparent; color: #007bff; border: 1px solid #007bff; border-radius: 5px; cursor: pointer;">
+                        <i class="fas fa-copy"></i> Copy Results
+                    </button>
+                    
+                    <div style="margin-top: 15px;">
+                        <small style="color: #666;">
+                            Prefer embedded form? 
+                            <a href="#" onclick="showEmbeddedForm(); return false;" style="color: #28a745;">
+                                Click here to open form below
+                            </a>
+                        </small>
                     </div>
-                `;
-            });
-            
-            // Add Google Forms integration with your actual survey
-            html += `
-                <div class="card mt-4" style="background: linear-gradient(135deg, #f0fff4 0%, #f8fff9 100%); border: 2px solid #28a745;">
-                    <div class="card-header text-white" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
-                        <h5 class="mb-0">
-                            <i class="fas fa-chart-line"></i> Help Us Improve - Evaluate This Team Formation
-                        </h5>
+                    
+                    <div id="embeddedFormContainer" style="display: none; margin-top: 20px;">
+                        <hr>
+                        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfjqhqiC3mDT3UU2R5oupe08Kr5ESuNTseKPQbEbwjPMumnRw/viewform?embedded=true" 
+                                width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">
+                            Loading feedback form...
+                        </iframe>
                     </div>
-                    <div class="card-body text-center py-4">
-                        <div class="mb-3">
-                            <h6 class="text-success mb-3">Your feedback is valuable for our scientific research. Please take 2-3 minutes to evaluate the team formation results.</h6>
-                            <p class="text-muted">Help us improve our team formation algorithms by sharing your experience with the generated teams.</p>
-                        </div>
-                        
-                        <div class="row justify-content-center">
-                            <div class="col-md-8">
-                                <div class="d-grid gap-2 d-md-block">
-                                    <button type="button" class="btn btn-success btn-lg me-3" onclick="openFeedbackForm()" style="min-width: 200px;">
-                                        <i class="fas fa-clipboard-list"></i> Provide Feedback
-                                    </button>
-                                    <button type="button" class="btn btn-outline-primary" onclick="copyTeamResults()">
-                                        <i class="fas fa-copy"></i> Copy Results for Review
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Embedded form option -->
-                        <div class="mt-3">
-                            <small class="text-muted">
-                                Prefer embedded form? 
-                                <a href="#" onclick="showEmbeddedForm(); return false;" style="color: #28a745;">
-                                    Click here to open form below
-                                </a>
-                            </small>
-                        </div>
-                        
-                        <!-- Embedded form container (initially hidden) -->
-                        <div id="embeddedFormContainer" style="display: none; margin-top: 20px;">
-                            <hr>
-                            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfjqhqiC3mDT3UU2R5oupe08Kr5ESuNTseKPQbEbwjPMumnRw/viewform?embedded=true" 
-                                    width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">
-                                Loading feedback form...
-                            </iframe>
-                        </div>
-                    </div>
-                </div>
-                
-                </div>
-                
-                <!-- JavaScript for Google Forms integration -->
-                <script>
-                function openFeedbackForm() {
-                    const feedbackFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSfjqhqiC3mDT3UU2R5oupe08Kr5ESuNTseKPQbEbwjPMumnRw/viewform';
-                    window.open(feedbackFormUrl, '_blank');
-                    setTimeout(() => {
-                        showNotification('Thank you for providing feedback! Your input helps us improve our team formation algorithms.', 'success');
-                    }, 1000);
-                }
-                
-                function showEmbeddedForm() {
-                    const container = document.getElementById('embeddedFormContainer');
-                    if (container) {
-                        container.style.display = container.style.display === 'none' ? 'block' : 'none';
-                        if (container.style.display === 'block') {
-                            setTimeout(() => {
-                                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }, 300);
-                        }
-                    }
-                }
-                
-                function copyTeamResults() {
-                    const teamsData = window.currentTeamResults || [];
-                    if (teamsData.length === 0) {
-                        alert('No team formation results available to copy.');
-                        return;
-                    }
-                    
-                    let resultText = 'Team Formation Results\n';
-                    resultText += 'Generated on: ' + new Date().toLocaleString() + '\n\n';
-                    
-                    teamsData.forEach((team, index) => {
-                        resultText += '=== ' + (team.team_name || 'Team ' + (index + 1)) + ' ===\n';
-                        resultText += 'Status: ' + (team.status || 'Unknown') + '\n';
-                        resultText += 'Algorithm: ' + (team.algorithm || 'N/A') + '\n';
-                        resultText += 'Skills Covered: ' + (team.skills_covered || []).join(', ') + '\n';
-                        resultText += 'Members (' + (team.members ? team.members.length : 0) + '):\n';
-                        
-                        if (team.members) {
-                            team.members.forEach((member, memberIndex) => {
-                                resultText += '  ' + (memberIndex + 1) + '. ' + member.author_name + '\n';
-                                resultText += '     Added For: ' + (member.added_for || member.role || 'N/A') + '\n';
-                                resultText += '     Skills: ' + (member.all_skills || 'N/A') + '\n';
-                                resultText += '     Papers: ' + (member.paper_count || 0) + '\n';
-                                resultText += '     Organizations: ' + ((member.organizations || []).join(', ') || 'N/A') + '\n';
-                                resultText += '     Citations: ' + (member.total_citations || 0) + '\n\n';
-                            });
-                        }
-                        resultText += '\n';
-                    });
-                    
-                    navigator.clipboard.writeText(resultText).then(() => {
-                        alert('Team results copied to clipboard!');
-                    }).catch(err => {
-                        console.error('Failed to copy text: ', err);
-                        alert('Failed to copy to clipboard. Please try again.');
-                    });
-                }
-                
-                function showNotification(message, type = 'info') {
-                    const notification = document.createElement('div');
-                    notification.className = 'alert alert-' + type + ' alert-dismissible fade show position-fixed';
-                    notification.style.top = '20px';
-                    notification.style.right = '20px';
-                    notification.style.zIndex = '9999';
-                    notification.style.minWidth = '300px';
-                    
-                    notification.innerHTML = message + '<button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>';
-                    
-                    document.body.appendChild(notification);
-                    
-                    setTimeout(() => {
-                        if (notification.parentElement) {
-                            notification.remove();
-                        }
-                    }, 5000);
-                }
-                </script>
-            `;
+                </div>`;
+            } else {
+                html += `<div class="error">No teams found</div>`;
+            }
 
             resultsDiv.innerHTML = html;
             resultsDiv.style.display = 'block';
+        }
+        
+        // Google Forms Integration Functions
+        function openFeedbackForm() {
+            const feedbackFormUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSfjqhqiC3mDT3UU2R5oupe08Kr5ESuNTseKPQbEbwjPMumnRw/viewform';
+            window.open(feedbackFormUrl, '_blank');
+        }
+        
+        function showEmbeddedForm() {
+            const container = document.getElementById('embeddedFormContainer');
+            if (container) {
+                container.style.display = container.style.display === 'none' ? 'block' : 'none';
+                if (container.style.display === 'block') {
+                    setTimeout(() => {
+                        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 300);
+                }
+            }
+        }
+        
+        function copyTeamResults() {
+            const teamsData = window.currentTeamResults || [];
+            if (teamsData.length === 0) {
+                alert('No team formation results available to copy.');
+                return;
+            }
+            
+            let resultText = 'Team Formation Results\n';
+            resultText += 'Generated on: ' + new Date().toLocaleString() + '\n\n';
+            
+            teamsData.forEach((team, index) => {
+                resultText += '=== ' + (team.team_name || 'Team ' + (index + 1)) + ' ===\n';
+                resultText += 'Status: ' + (team.status || 'Unknown') + '\n';
+                resultText += 'Algorithm: ' + (team.algorithm || 'N/A') + '\n';
+                resultText += 'Skills Covered: ' + (team.skills_covered || []).join(', ') + '\n';
+                resultText += 'Members (' + (team.members ? team.members.length : 0) + '):\n';
+                
+                if (team.members) {
+                    team.members.forEach((member, memberIndex) => {
+                        resultText += '  ' + (memberIndex + 1) + '. ' + member.author_name + '\n';
+                        resultText += '     Added For: ' + (member.added_for || member.role || 'N/A') + '\n';
+                        resultText += '     Skills: ' + (member.all_skills || 'N/A') + '\n';
+                        resultText += '     Papers: ' + (member.paper_count || 0) + '\n';
+                        resultText += '     Organizations: ' + ((member.organizations || []).join(', ') || 'N/A') + '\n';
+                        resultText += '     Citations: ' + (member.total_citations || 0) + '\n\n';
+                    });
+                }
+                resultText += '\n';
+            });
+            
+            navigator.clipboard.writeText(resultText).then(() => {
+                alert('Team results copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                alert('Failed to copy to clipboard. Please try again.');
+            });
         }
     </script>
 </body>
