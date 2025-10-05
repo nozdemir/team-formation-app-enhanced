@@ -561,6 +561,8 @@
                     throw new Error(`HTTP ${response.status}: ${data.error || 'Unknown server error'}`);
                 }
 
+                // Store keywords for displayResults function
+                window.lastUsedKeywords = [...selectedKeywords];
                 displayResults(data);
                 showStatus('Teams formed successfully!', 'success');
                 
@@ -632,12 +634,18 @@
             const teams = data.teams || [];
             const totalTeams = teams.length;
             
-            // Use selectedKeywords array instead of input field (which may be cleared)
-            const allRequestedKeywords = [...selectedKeywords]; // Use the global selectedKeywords array
+            // Use stored keywords from the form submission
+            const allRequestedKeywords = window.lastUsedKeywords || selectedKeywords || [];
             const requiredTeamSize = allRequestedKeywords.length;
             
             console.log('Selected keywords for analysis:', allRequestedKeywords);
             console.log('Required team size:', requiredTeamSize);
+            
+            // If no keywords, something is wrong - let's debug
+            if (allRequestedKeywords.length === 0) {
+                console.error('No keywords found! selectedKeywords:', selectedKeywords);
+                console.error('window.lastUsedKeywords:', window.lastUsedKeywords);
+            }
             
             // Calculate team completeness based on keyword coverage AND required team size
             let completeTeams = 0;
@@ -719,18 +727,22 @@
             if (data.teams && data.teams.length > 0) {
                 data.teams.forEach((team, index) => {
                     const members = team.members || [];
-                    // Team size should equal the number of keywords (one member per keyword)
-                    const requiredSize = allRequestedKeywords.length;
+                    // Team size should equal the number of keywords (fallback to team size from server if keywords not available)
+                    const requiredSize = allRequestedKeywords.length > 0 ? allRequestedKeywords.length : (team.expected_size || members.length);
                     const currentSize = members.length;
                     
                     // Calculate team completeness based on keyword coverage
                     const coveredKeywords = team.skills_covered || [];
-                    const missingKeywords = allRequestedKeywords.filter(keyword => 
-                        !coveredKeywords.some(covered => covered.toLowerCase().includes(keyword.toLowerCase()))
-                    );
+                    const missingKeywords = allRequestedKeywords.length > 0 ? 
+                        allRequestedKeywords.filter(keyword => 
+                            !coveredKeywords.some(covered => covered.toLowerCase().includes(keyword.toLowerCase()))
+                        ) : [];
                     
                     // Team is complete if ALL keywords are covered AND we have the right number of members
-                    const hasAllKeywords = missingKeywords.length === 0 && allRequestedKeywords.length > 0;
+                    // If no keywords available, use fallback logic based on team completeness
+                    const hasAllKeywords = allRequestedKeywords.length > 0 ? 
+                        (missingKeywords.length === 0 && allRequestedKeywords.length > 0) :
+                        (team.completeness || 1) >= 1.0;
                     const hasRequiredMembers = currentSize >= requiredSize;
                     const isComplete = hasAllKeywords && hasRequiredMembers;
                     const completionStatus = isComplete ? 'Complete' : 'Incomplete';
