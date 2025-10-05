@@ -267,17 +267,18 @@ def api_form_teams():
                         'requested_skills': team.get('missing_skills', [])
                     }
                     
-                    # Process team members with enhanced details
+                    # Process team members with all available data
                     members = team.get('members', [])
                     for member in members:
                         if isinstance(member, dict):
                             formatted_team['members'].append({
                                 'author_name': member.get('author_name', member.get('name', 'Unknown')),
                                 'role': member.get('role', 'Member'),
-                                'added_for': member.get('added_for', 'Team Member'),
-                                'skills': member.get('skills', 'No skills data available'),
+                                'added_for': member.get('added_for', member.get('role', 'Team Member')),
+                                'all_skills': member.get('all_skills', member.get('skills', 'No skills data')),
+                                'skills': member.get('skills', member.get('all_skills', 'No skills data')),
                                 'paper_count': member.get('paper_count', 0),
-                                'organizations': member.get('organizations', 'No organization data'),
+                                'organizations': member.get('organizations', []),
                                 'total_citations': member.get('total_citations', 0),
                                 'expertise': member.get('expertise', 'General expertise')
                             })
@@ -287,9 +288,10 @@ def api_form_teams():
                                 'author_name': str(member),
                                 'role': 'Member',
                                 'added_for': 'Team Member',
+                                'all_skills': 'Data unavailable',
                                 'skills': 'Data unavailable',
                                 'paper_count': 0,
-                                'organizations': 'Data unavailable',
+                                'organizations': [],
                                 'total_citations': 0,
                                 'expertise': 'General expertise'
                             })

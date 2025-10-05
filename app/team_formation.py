@@ -1253,12 +1253,14 @@ class ScientificTeamFormation:
                         team_skills = set()
                         team_status = "complete"
                         
-                        # Get enhanced details for team members
+
+                        
+                        # Get enhanced details for all team members at once
                         team_member_ids = [str(row.get('Author ID', '')) for _, row in team_data.iterrows()]
                         
                         with self.driver.session() as session:
                             enhanced_details = session.execute_read(self.get_enhanced_member_details, team_member_ids)
-                            
+                        
                         # Create a mapping of author_id to enhanced details
                         details_map = {detail['author_id']: detail for detail in enhanced_details}
                         
@@ -1268,26 +1270,20 @@ class ScientificTeamFormation:
                             matching_skills = str(row.get('Matching Skills', ''))
                             added_for_skill = str(row.get('Added For Skill', 'Team Member'))
                             
-                            # Get enhanced details for this member
+                            # Get enhanced details from database
                             enhanced_detail = details_map.get(author_id, {})
-                            member_skills = enhanced_detail.get('skills', 'No skills data available')
-                            paper_count = enhanced_detail.get('paper_count', 0)
-                            organizations = enhanced_detail.get('organizations', [])
-                            total_citations = enhanced_detail.get('total_citations', 0)
-                            
-                            # Format organizations display
-                            org_display = ', '.join(organizations) if organizations else 'No organization data'
                             
                             members.append({
                                 "author_id": author_id,
                                 "author_name": author_name,
-                                "expertise": matching_skills if matching_skills and matching_skills != 'nan' else 'General expertise',
+                                "expertise": matching_skills,
+                                "role": added_for_skill,
                                 "added_for": added_for_skill,
-                                "skills": member_skills,  # All skills from database
-                                "paper_count": paper_count,
-                                "organizations": org_display,
-                                "total_citations": total_citations,
-                                "role": added_for_skill
+                                "all_skills": enhanced_detail.get('skills', 'No skills data'),
+                                "skills": enhanced_detail.get('skills', 'No skills data'),
+                                "paper_count": enhanced_detail.get('paper_count', 0),
+                                "organizations": enhanced_detail.get('organizations', []),
+                                "total_citations": enhanced_detail.get('total_citations', 0)
                             })
                             
                             if matching_skills and matching_skills != 'nan':

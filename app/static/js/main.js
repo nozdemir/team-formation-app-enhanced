@@ -130,16 +130,14 @@ function displayResults(data) {
                                 <div class="row">
             `;
             
-            // Enhanced member display
+            // Member display with database-calculated values
             members.forEach(member => {
                 const name = member.author_name || member.name || 'Unknown';
                 const id = member.author_id || member.id || '';
-                const addedFor = member.added_for || member.role || 'Team Member';
-                const allSkills = member.skills || member.all_skills || member.expertise || 'No skills data';
+                const addedFor = member.role || member.added_for || 'Team Member';
+                const allSkills = member.all_skills || member.skills || 'No skills data available';
                 const paperCount = member.paper_count || 0;
-                const organizations = typeof member.organizations === 'string' ? 
-                    member.organizations.split(',').map(s => s.trim()).filter(s => s) : 
-                    (member.organizations || []);
+                const organizations = member.organizations || [];
                 const totalCitations = member.total_citations || 0;
                 
                 html += `
@@ -161,7 +159,7 @@ function displayResults(data) {
                 `;
                 
                 // Display skills as badges
-                if (allSkills && allSkills !== 'No skills data') {
+                if (allSkills && allSkills !== 'No skills data available') {
                     const skillsArray = allSkills.split(',').map(s => s.trim()).filter(s => s);
                     skillsArray.slice(0, 5).forEach(skill => { // Show max 5 skills
                         html += `<span class="badge bg-light text-dark me-1 mb-1">${skill}</span>`;
