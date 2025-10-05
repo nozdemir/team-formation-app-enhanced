@@ -631,8 +631,13 @@
             // Calculate statistics with correct completeness logic
             const teams = data.teams || [];
             const totalTeams = teams.length;
-            const allRequestedKeywords = (document.getElementById('keywords')?.value || '').split(',').map(k => k.trim()).filter(k => k);
+            
+            // Use selectedKeywords array instead of input field (which may be cleared)
+            const allRequestedKeywords = [...selectedKeywords]; // Use the global selectedKeywords array
             const requiredTeamSize = allRequestedKeywords.length;
+            
+            console.log('Selected keywords for analysis:', allRequestedKeywords);
+            console.log('Required team size:', requiredTeamSize);
             
             // Calculate team completeness based on keyword coverage AND required team size
             let completeTeams = 0;
