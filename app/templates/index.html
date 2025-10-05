@@ -632,15 +632,19 @@
             const teams = data.teams || [];
             const totalTeams = teams.length;
             const allRequestedKeywords = (document.getElementById('keywords')?.value || '').split(',').map(k => k.trim()).filter(k => k);
+            const requiredTeamSize = allRequestedKeywords.length;
             
-            // Calculate team completeness based on keyword coverage
+            // Calculate team completeness based on keyword coverage AND required team size
             let completeTeams = 0;
             teams.forEach(team => {
                 const coveredKeywords = team.skills_covered || [];
+                const members = team.members || [];
                 const missingKeywords = allRequestedKeywords.filter(keyword => 
                     !coveredKeywords.some(covered => covered.toLowerCase().includes(keyword.toLowerCase()))
                 );
-                if (missingKeywords.length === 0 && allRequestedKeywords.length > 0) {
+                const hasAllKeywords = missingKeywords.length === 0 && allRequestedKeywords.length > 0;
+                const hasRequiredMembers = members.length >= requiredTeamSize;
+                if (hasAllKeywords && hasRequiredMembers) {
                     completeTeams++;
                 }
             });
@@ -710,7 +714,8 @@
             if (data.teams && data.teams.length > 0) {
                 data.teams.forEach((team, index) => {
                     const members = team.members || [];
-                    const requiredSize = parseInt(document.getElementById('team_size')?.value || 5);
+                    // Team size should equal the number of keywords (one member per keyword)
+                    const requiredSize = allRequestedKeywords.length;
                     const currentSize = members.length;
                     
                     // Calculate team completeness based on keyword coverage
@@ -719,8 +724,10 @@
                         !coveredKeywords.some(covered => covered.toLowerCase().includes(keyword.toLowerCase()))
                     );
                     
-                    // Team is complete only if ALL keywords are covered
-                    const isComplete = missingKeywords.length === 0 && allRequestedKeywords.length > 0;
+                    // Team is complete if ALL keywords are covered AND we have the right number of members
+                    const hasAllKeywords = missingKeywords.length === 0 && allRequestedKeywords.length > 0;
+                    const hasRequiredMembers = currentSize >= requiredSize;
+                    const isComplete = hasAllKeywords && hasRequiredMembers;
                     const completionStatus = isComplete ? 'Complete' : 'Incomplete';
                     const statusColor = isComplete ? '#90ee90' : '#ffb6c1';
                     const statusIcon = isComplete ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
@@ -735,7 +742,7 @@
                                 </span>
                                 <br>
                                 <small style="color: #666; margin-top: 5px; display: block;">
-                                    ${currentSize}/${requiredSize} members found
+                                    ${currentSize}/${requiredSize} members (${requiredSize} keywords)
                                 </small>
                             </div>
                         </div>
