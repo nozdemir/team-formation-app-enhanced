@@ -109,17 +109,24 @@ class ScientificTeamFormation:
             
             logger.info(f"Connecting to Neo4j at: {neo4j_uri}")
             
+            # Configure timeouts for serverless mode (AuraDB with Graph Analytics Serverless)
             self.driver = GraphDatabase.driver(
                 neo4j_uri, 
-                auth=(neo4j_user, neo4j_password)
+                auth=(neo4j_user, neo4j_password),
+                # Increased timeouts for serverless graph analytics
+                connection_timeout=60.0,  # 60 seconds for initial connection
+                max_connection_lifetime=300.0,  # 5 minutes max connection lifetime
+                max_connection_pool_size=10,
+                connection_acquisition_timeout=120.0  # 2 minutes to acquire connection
             )
             
-            # Test connection
-            with self.driver.session() as session:
-                result = session.run("RETURN 1 as test")
-                test_value = result.single()["test"]
-                if test_value == 1:
-                    logger.info("Successfully connected to Neo4j cloud database")
+            # Test connection with increased timeout
+            with self.driver.session(default_access_mode="READ") as session:
+                # Use query with timeout for serverless mode
+                result = session.run("RETURN 1 as test", timeout=60)
+                test_record = result.single()
+                if test_record and test_record["test"] == 1:
+                    logger.info("Successfully connected to Neo4j cloud database with extended timeouts")
                 else:
                     raise Exception("Connection test failed")
                     
@@ -1188,11 +1195,18 @@ class ScientificTeamFormation:
             logger.info(f"Keywords: {keywords}")
             logger.info(f"Requested teams: {num_teams}")
             
-            # Debug: Test basic database connectivity
+            # Debug: Test basic database connectivity with extended timeout
             try:
-                with self.driver.session() as session:
-                    test_result = session.run("MATCH (a:Author) RETURN count(a) as total_authors LIMIT 1")
-                    author_count = test_result.single()["total_authors"]
+                # Use session with extended timeout for serverless mode
+                with self.driver.session(
+                    default_access_mode="READ",
+                    fetch_size=1000,
+                    connection_acquisition_timeout=120
+                ) as session:
+                    # Use extended timeout for queries in serverless mode
+                    test_result = session.run("MATCH (a:Author) RETURN count(a) as total_authors LIMIT 1", timeout=90)
+                    author_record = test_result.single()
+                    author_count = author_record["total_authors"] if author_record else 0
                     logger.info(f"Database connectivity test: Found {author_count} total authors")
                     
                     # Test keyword search
@@ -1207,7 +1221,7 @@ class ScientificTeamFormation:
                     LIMIT 5
                     """
                     
-                    test_result = session.run(test_keyword_query, keyword=keywords[0])
+                    test_result = session.run(test_keyword_query, keyword=keywords[0], timeout=90)
                     test_authors = list(test_result)
                     logger.info(f"Test search for '{keywords[0]}' found {len(test_authors)} authors")
                     for author in test_authors[:3]:
