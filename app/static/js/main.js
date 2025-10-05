@@ -104,57 +104,182 @@ function displayResults(data) {
             <br>
     `;
     
-    // Display each team in detailed format
-    teams.forEach((team, index) => {
-        const teamNumber = team.team_number || index + 1;
-        const members = team.members || [];
-        const completeness = team.completeness || 1;
-        const skillsCovered = team.skills_covered || [];
-        const requestedSkills = team.requested_skills || summary.keywords_requested || [];
-        
-        const isComplete = completeness >= 1.0;
-        const emoji = isComplete ? '✅' : '⚠️';
-        const status = isComplete ? 'Complete (100%)' : `Incomplete (${Math.round(completeness * 100)}%)`;
-        const coverage = `${skillsCovered.length}/${requestedSkills.length}`;
-        
-        html += `
-            <div class="team-section" style="margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-                <h4>${emoji} Team ${teamNumber}</h4>
-                <p><strong>${status} Coverage: ${coverage}</strong></p>
-                <br>
-                <p><strong>Keywords Found:</strong> ${skillsCovered.join(', ')}</p>
-        `;
-        
-        if (!isComplete) {
-            const missingSkills = requestedSkills.filter(skill => !skillsCovered.includes(skill));
-            html += `<p><strong>Missing Keywords:</strong> ${missingSkills.join(', ')}</p>`;
-        }
-        
-        html += `
-                <p><strong>Skills Covered:</strong> ${skillsCovered.join(', ')}</p>
-                <h5>👥 Team Members (${members.length})</h5>
-        `;
-        
-        members.forEach(member => {
-            const name = member.author_name || member.name || 'Unknown';
-            const id = member.author_id || member.id || '';
-            const expertise = member.expertise || 'General';
-            const addedFor = member.role || 'Member';
+        // Display each team in enhanced detailed format
+        teams.forEach((team, index) => {
+            const teamNumber = team.team_number || index + 1;
+            const members = team.members || [];
+            const completeness = team.completeness || 1;
+            const skillsCovered = team.skills_covered || [];
+            const requestedSkills = team.requested_skills || summary.keywords_requested || [];
+            
+            const isComplete = completeness >= 1.0;
+            const emoji = isComplete ? '✅' : '⚠️';
+            const status = isComplete ? 'Complete (100%)' : `Incomplete (${Math.round(completeness * 100)}%)`;
+            const coverage = `${skillsCovered.length}/${requestedSkills.length}`;
             
             html += `
-                <div style="margin-left: 20px; margin-bottom: 15px;">
-                    <p><strong>👤 ${name}</strong></p>
-                    ${id ? `<p>ID: ${id}</p>` : ''}
-                    <p><strong>Added For:</strong> ${addedFor}</p>
-                    <p><strong>Expertise:</strong> ${expertise}</p>
+                <div class="card team-card shadow-sm" style="margin-bottom: 30px;">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">${emoji} Team ${teamNumber}</h5>
+                        <span class="badge bg-light text-dark">${status}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <h6><i class="fas fa-user-friends"></i> Team Members (${members.length})</h6>
+                                <div class="row">
+            `;
+            
+            // Enhanced member display
+            members.forEach(member => {
+                const name = member.author_name || member.name || 'Unknown';
+                const id = member.author_id || member.id || '';
+                const addedFor = member.added_for || member.role || 'Team Member';
+                const allSkills = member.all_skills || member.expertise || 'No skills data';
+                const paperCount = member.paper_count || 0;
+                const organizations = member.organizations || [];
+                const totalCitations = member.total_citations || 0;
+                
+                html += `
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100 border-left-primary">
+                            <div class="card-body p-3">
+                                <h6 class="text-primary mb-2">
+                                    <i class="fas fa-user"></i> ${name}
+                                </h6>
+                                
+                                <div class="mb-2">
+                                    <strong>Added For:</strong>
+                                    <span class="badge bg-info">${addedFor}</span>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <strong>Skills:</strong>
+                                    <div class="mt-1">
+                `;
+                
+                // Display skills as badges
+                if (allSkills && allSkills !== 'No skills data') {
+                    const skillsArray = allSkills.split(',').map(s => s.trim()).filter(s => s);
+                    skillsArray.slice(0, 5).forEach(skill => { // Show max 5 skills
+                        html += `<span class="badge bg-light text-dark me-1 mb-1">${skill}</span>`;
+                    });
+                    if (skillsArray.length > 5) {
+                        html += `<span class="badge bg-secondary">+${skillsArray.length - 5} more</span>`;
+                    }
+                } else {
+                    html += `<span class="text-muted">No skills data</span>`;
+                }
+                
+                html += `
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <strong>Number of Papers:</strong>
+                                    <span class="badge bg-secondary">${paperCount}</span>
+                                </div>
+                `;
+                
+                // Display organizations
+                if (organizations && organizations.length > 0) {
+                    html += `
+                        <div class="mb-2">
+                            <strong>Organizations:</strong>
+                            <div class="mt-1">
+                    `;
+                    organizations.slice(0, 3).forEach(org => { // Show max 3 organizations
+                        if (org) {
+                            html += `<span class="badge bg-success me-1 mb-1">${org}</span>`;
+                        }
+                    });
+                    if (organizations.length > 3) {
+                        html += `<span class="badge bg-secondary">+${organizations.length - 3} more</span>`;
+                    }
+                    html += `</div></div>`;
+                }
+                
+                html += `
+                                <div class="mb-1">
+                                    <strong>Total Citations:</strong>
+                                    <span class="badge bg-warning">${totalCitations}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-4">
+                                <h6><i class="fas fa-chart-pie"></i> Team Statistics</h6>
+                                
+                                <div class="card mb-3">
+                                    <div class="card-body p-3">
+                                        <h6 class="card-title">Skills Coverage</h6>
+            `;
+            
+            if (skillsCovered.length > 0) {
+                skillsCovered.forEach(skill => {
+                    html += `<span class="badge bg-success me-1 mb-1">${skill}</span>`;
+                });
+            } else {
+                html += `<small class="text-muted">No skills covered information</small>`;
+            }
+            
+            html += `
+                                    </div>
+                                </div>
+                                
+                                <div class="card mb-3">
+                                    <div class="card-body p-3">
+                                        <h6 class="card-title">Requested Skills</h6>
+            `;
+            
+            if (requestedSkills.length > 0) {
+                requestedSkills.forEach(skill => {
+                    html += `<span class="badge bg-primary me-1 mb-1">${skill}</span>`;
+                });
+            }
+            
+            // Calculate team metrics
+            const totalPapers = members.reduce((sum, m) => sum + (m.paper_count || 0), 0);
+            const totalTeamCitations = members.reduce((sum, m) => sum + (m.total_citations || 0), 0);
+            
+            html += `
+                                    </div>
+                                </div>
+                                
+                                <div class="card">
+                                    <div class="card-body p-3">
+                                        <h6 class="card-title">Team Metrics</h6>
+                                        <div class="row text-center">
+                                            <div class="col-6">
+                                                <h5 class="text-info">${members.length}</h5>
+                                                <small>Members</small>
+                                            </div>
+                                            <div class="col-6">
+                                                <h5 class="text-success">${totalPapers}</h5>
+                                                <small>Total Papers</small>
+                                            </div>
+                                        </div>
+                                        <div class="row text-center mt-2">
+                                            <div class="col-12">
+                                                <h5 class="text-warning">${totalTeamCitations}</h5>
+                                                <small>Total Citations</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
-        });
-        
-        html += '</div>';
-    });
-    
-    // Add Google Forms integration with your actual survey
+        });    // Add Google Forms integration with your actual survey
     html += `
         <div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #f0fff4 0%, #f8fff9 100%); border: 2px solid #28a745; border-radius: 10px;">
             <div class="text-center">
