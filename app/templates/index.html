@@ -303,9 +303,17 @@
                     <input type="number" id="numTeams" name="numTeams" min="1" max="20" value="5" required>
                 </div>
 
-                <button type="submit" class="btn" id="submitBtn">
-                    Form Teams 🚀
-                </button>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button type="submit" class="btn" id="submitBtn" style="flex: 1;">
+                        Form Teams 🚀
+                    </button>
+                    <button type="button" class="btn" id="stopBtn" style="background: #dc3545; display: none; flex: 0 0 auto; padding: 15px 20px;">
+                        ⚙️ Stop
+                    </button>
+                    <button type="button" class="btn" id="optimizeBtn" style="background: #28a745; flex: 0 0 auto; padding: 15px 20px;" onclick="optimizeDatabase()">
+                        ⚡ Optimize DB
+                    </button>
+                </div>
             </form>
 
             <div id="status"></div>
@@ -503,6 +511,68 @@
             }
         });
 
+        // Database optimization function
+        async function optimizeDatabase() {
+            const optimizeBtn = document.getElementById('optimizeBtn');
+            const originalText = optimizeBtn.textContent;
+            
+            try {
+                optimizeBtn.disabled = true;
+                optimizeBtn.textContent = '⚡ Optimizing...';
+                showStatus('Creating database indexes for better performance...', 'info');
+                
+                const response = await fetch('/api/create-indexes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus(`✅ Database optimized! Created ${result.created_indexes.length} indexes. Performance should be MUCH faster now!`, 'success');
+                } else {
+                    showStatus(`❌ Optimization failed: ${result.error}`, 'error');
+                }
+                
+            } catch (error) {
+                showStatus(`❌ Optimization error: ${error.message}`, 'error');
+            } finally {
+                optimizeBtn.disabled = false;
+                optimizeBtn.textContent = originalText;
+            }
+        }
+        
+        // Stop task function
+        async function stopCurrentTask() {
+            if (!window.currentTaskId) {
+                showStatus('No active task to stop', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/stop-task/${window.currentTaskId}`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus('🛑 Task stopped successfully', 'info');
+                    // Reset UI
+                    document.getElementById('submitBtn').disabled = false;
+                    document.getElementById('submitBtn').textContent = 'Form Teams 🚀';
+                    document.getElementById('stopBtn').style.display = 'none';
+                    document.getElementById('results').innerHTML = '<p style="text-align: center; color: #666;">Task stopped by user</p>';
+                    window.currentTaskId = null;
+                } else {
+                    showStatus(`❌ Failed to stop task: ${result.error}`, 'error');
+                }
+                
+            } catch (error) {
+                showStatus(`❌ Stop error: ${error.message}`, 'error');
+            }
+        }
+
         // Async team formation function to bypass Heroku 30s timeout
         async function formTeamsAsync() {
             window.teamFormationStartTime = Date.now();
@@ -574,9 +644,17 @@
                 }
                 
                 const taskId = startData.task_id;
+                window.currentTaskId = taskId; // Store for stop functionality
                 console.log('Task started:', taskId);
                 
                 submitBtn.textContent = '🔄 Processing in Background...';
+                
+                // Show stop button
+                const stopBtn = document.getElementById('stopBtn');
+                if (stopBtn) {
+                    stopBtn.style.display = 'inline-block';
+                    stopBtn.onclick = stopCurrentTask;
+                }
                 
                 // Update progress display
                 document.querySelector('.loading h3').innerHTML = '🔄 Processing in Background...';
@@ -631,10 +709,21 @@
                             
                             submitBtn.disabled = false;
                             submitBtn.textContent = 'Form Teams 🚀';
+                            document.getElementById('stopBtn').style.display = 'none';
+                            window.currentTaskId = null;
                             
                         } else if (status.status === 'failed') {
                             clearInterval(pollInterval);
+                            document.getElementById('stopBtn').style.display = 'none';
+                            window.currentTaskId = null;
                             throw new Error(status.error || 'Processing failed');
+                        } else if (status.status === 'stopped') {
+                            clearInterval(pollInterval);
+                            document.getElementById('stopBtn').style.display = 'none';
+                            window.currentTaskId = null;
+                            showStatus('🛑 Task was stopped', 'info');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Form Teams 🚀';
                         }
                         
                     } catch (pollError) {

@@ -233,6 +233,79 @@ def form_teams_async():
             'error': f'Failed to start team formation: {str(e)}'
         }), 500
 
+@main.route('/api/create-indexes', methods=['POST'])
+def create_database_indexes():
+    """Create database indexes to improve performance"""
+    try:
+        tf = get_team_formation()
+        
+        # Index creation queries
+        index_queries = [
+            "CREATE INDEX author_id_index IF NOT EXISTS FOR (a:Author) ON (a.Author_ID)",
+            "CREATE INDEX author_skills_index IF NOT EXISTS FOR (a:Author) ON (a.skills)", 
+            "CREATE INDEX author_name_index IF NOT EXISTS FOR (a:Author) ON (a.Author_Name)",
+            "CREATE INDEX paper_keywords_index IF NOT EXISTS FOR (p:Paper) ON (p.Combined_Keywords)",
+            "CREATE INDEX paper_citations_index IF NOT EXISTS FOR (p:Paper) ON (p.n_Citation)",
+            "CREATE INDEX paper_years_index IF NOT EXISTS FOR (p:Paper) ON (p.Years_Passed)",
+            "CREATE FULLTEXT INDEX author_skills_fulltext IF NOT EXISTS FOR (a:Author) ON EACH [a.skills]",
+            "CREATE FULLTEXT INDEX paper_keywords_fulltext IF NOT EXISTS FOR (p:Paper) ON EACH [p.Combined_Keywords]"
+        ]
+        
+        created_indexes = []
+        errors = []
+        
+        with tf.driver.session() as session:
+            for query in index_queries:
+                try:
+                    session.run(query, timeout=30)
+                    index_name = query.split('INDEX ')[1].split(' IF NOT')[0]
+                    created_indexes.append(index_name)
+                    logger.info(f"Created index: {index_name}")
+                except Exception as e:
+                    errors.append(f"Failed to create index: {str(e)}")
+                    logger.error(f"Index creation error: {e}")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Database optimization completed',
+            'created_indexes': created_indexes,
+            'errors': errors
+        })
+        
+    except Exception as e:
+        logger.error(f"Error creating indexes: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Failed to create indexes: {str(e)}'
+        }), 500
+
+@main.route('/api/stop-task/<task_id>', methods=['POST'])
+def stop_task(task_id):
+    """Stop a running async task"""
+    try:
+        if task_id not in task_status:
+            return jsonify({'success': False, 'error': 'Task not found'}), 404
+            
+        # Mark task as stopped
+        task_status[task_id]['status'] = 'stopped'
+        task_status[task_id]['message'] = 'Task stopped by user'
+        
+        # Clean up results if exists
+        if task_id in task_results:
+            del task_results[task_id]
+            
+        return jsonify({
+            'success': True,
+            'message': 'Task stopped successfully'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error stopping task: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Failed to stop task: {str(e)}'
+        }), 500
+
 @main.route('/api/task-status/<task_id>', methods=['GET'])
 def get_task_status(task_id):
     """Get status of asynchronous team formation task"""
