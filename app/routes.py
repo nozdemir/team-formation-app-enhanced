@@ -156,6 +156,112 @@ def test_connection():
             'success': False,
             'error': f'Database connection error: {str(e)}'
         }), 500
+# Store for async task results
+task_results = {}
+task_status = {}
+
+@main.route('/api/form-teams-async', methods=['POST'])
+def form_teams_async():
+    """Start asynchronous team formation to bypass Heroku 30s timeout"""
+    import uuid
+    import threading
+    import time
+    
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+            
+        # Generate unique task ID
+        task_id = str(uuid.uuid4())
+        
+        # Initialize task status
+        task_status[task_id] = {
+            'status': 'started',
+            'progress': 0,
+            'message': 'Initializing team formation...',
+            'start_time': time.time()
+        }
+        
+        def async_team_formation():
+            try:
+                task_status[task_id]['status'] = 'processing'
+                task_status[task_id]['message'] = 'Connecting to database...'
+                task_status[task_id]['progress'] = 10
+                
+                tf = get_team_formation()
+                
+                task_status[task_id]['message'] = 'Running team formation algorithm...'
+                task_status[task_id]['progress'] = 30
+                
+                result = tf.form_teams(
+                    algorithm=data.get('algorithm'),
+                    keywords=data.get('keywords', []),
+                    team_size=data.get('team_size', 5),
+                    num_teams=data.get('num_teams', 3)
+                )
+                
+                task_status[task_id]['progress'] = 90
+                task_status[task_id]['message'] = 'Finalizing results...'
+                
+                task_results[task_id] = result
+                task_status[task_id]['status'] = 'completed'
+                task_status[task_id]['progress'] = 100
+                task_status[task_id]['message'] = 'Team formation completed!'
+                
+            except Exception as e:
+                logger.error(f"Async team formation error: {e}")
+                task_status[task_id]['status'] = 'failed'
+                task_status[task_id]['error'] = str(e)
+                task_status[task_id]['message'] = f'Error: {str(e)}'
+        
+        # Start background thread
+        thread = threading.Thread(target=async_team_formation)
+        thread.daemon = True
+        thread.start()
+        
+        return jsonify({
+            'success': True,
+            'task_id': task_id,
+            'message': 'Team formation started in background'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error starting async team formation: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Failed to start team formation: {str(e)}'
+        }), 500
+
+@main.route('/api/task-status/<task_id>', methods=['GET'])
+def get_task_status(task_id):
+    """Get status of asynchronous team formation task"""
+    import time
+    try:
+        if task_id not in task_status:
+            return jsonify({'success': False, 'error': 'Task not found'}), 404
+            
+        status = task_status[task_id].copy()
+        
+        # Add elapsed time
+        if 'start_time' in status:
+            status['elapsed_seconds'] = int(time.time() - status['start_time'])
+            
+        # If completed, include results
+        if status['status'] == 'completed' and task_id in task_results:
+            status['result'] = task_results[task_id]
+            
+        return jsonify({
+            'success': True,
+            'task_status': status
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting task status: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Failed to get task status: {str(e)}'
+        }), 500
 
 @main.route('/api/form-teams', methods=['POST'])
 def api_form_teams():

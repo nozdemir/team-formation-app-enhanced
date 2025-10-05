@@ -500,9 +500,123 @@
             }
         });
 
+        // Async team formation function to bypass Heroku 30s timeout
+        async function formTeamsAsync() {
+            // Record start time for performance tracking
+            window.teamFormationStartTime = Date.now();
+
+            if (selectedKeywords.length === 0) {
+                showStatus('Please select at least one keyword.', 'error');
+                return;
+            }
+
+            const algorithm = document.getElementById('algorithm').value;
+            const numTeams = parseInt(document.getElementById('numTeams').value);
+            
+            if (!algorithm) {
+                showStatus('Please select an algorithm.', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            const resultsDiv = document.getElementById('results');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '🔄 Starting Team Formation...';
+            
+            // Show loading in results area
+            resultsDiv.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <h3 style="color: #2a5298; margin-bottom: 15px;">🔄 Forming Teams...</h3>
+                    <p style="font-size: 16px; margin-bottom: 10px;">Algorithm: <strong>${algorithm.replace('_', ' ')}</strong></p>
+                    <p style="font-size: 14px; margin-bottom: 20px;">Keywords: <strong>${selectedKeywords.join(', ')}</strong></p>
+                    
+                    <div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                        <div style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">
+                            ⏱️ <span id="elapsedTimer">0</span> seconds
+                        </div>
+                        <div style="font-size: 12px; opacity: 0.9;">
+                            Processing time (async mode - no more timeouts!)
+                        </div>
+                        <div style="width: 100%; background-color: rgba(255,255,255,0.3); border-radius: 10px; height: 8px; margin-top: 10px; overflow: hidden;">
+                            <div id="progressBar" style="width: 5%; background-color: #90ee90; height: 100%; border-radius: 10px; transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                    
+                    <p style="font-size: 12px; color: #666; margin-top: 15px;">
+                        <i class="fas fa-info-circle"></i> Now using async processing - no more 30-second timeouts!
+                    </p>
+                </div>
+            `;
+            resultsDiv.style.display = 'block';
+            
+            try {
+                // Start async team formation
+                const startResponse = await fetch('/api/form-teams-async', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        algorithm: algorithm,
+                        keywords: selectedKeywords,
+                        num_teams: numTeams
+                    })
+                });
+                
+                if (!startResponse.ok) {
+                    throw new Error(`Failed to start: ${startResponse.status}`);
+                }
+                
+                const startData = await startResponse.json();
+                if (!startData.success) {
+                    throw new Error(startData.error || 'Failed to start');
+                }
+                
+                const taskId = startData.task_id;
+                submitBtn.textContent = '🔄 Processing...';
+                
+                // Poll for results
+                let elapsedSeconds = 0;
+                const pollInterval = setInterval(async () => {
+                    elapsedSeconds += 5;
+                    document.getElementById('elapsedTimer').textContent = elapsedSeconds;
+                    document.getElementById('progressBar').style.width = Math.min(elapsedSeconds / 10, 95) + '%';
+                    
+                    try {
+                        const statusResponse = await fetch(`/api/task-status/${taskId}`);
+                        const statusData = await statusResponse.json();
+                        const status = statusData.task_status;
+                        
+                        if (status.status === 'completed') {
+                            clearInterval(pollInterval);
+                            window.lastUsedKeywords = [...selectedKeywords];
+                            displayResults(status.result);
+                            showStatus('Teams formed successfully!', 'success');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Form Teams 🚀';
+                        } else if (status.status === 'failed') {
+                            clearInterval(pollInterval);
+                            throw new Error(status.error || 'Processing failed');
+                        }
+                    } catch (pollError) {
+                        clearInterval(pollInterval);
+                        throw pollError;
+                    }
+                }, 5000);
+                
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Form Teams 🚀';
+            }
+        }
+
         // Form submission
-        document.getElementById('teamFormationForm').addEventListener('submit', async function(e) {
+        document.getElementById('teamFormationForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            formTeamsAsync();
+        });
 
             // Record start time for performance tracking
             window.teamFormationStartTime = Date.now();
@@ -585,17 +699,14 @@
             window.currentTimerInterval = timerInterval;
 
             try {
-                console.log('Sending request:', {
+                console.log('Starting async team formation:', {
                     algorithm: algorithm,
                     keywords: selectedKeywords,
                     num_teams: numTeams
                 });
 
-                // Create AbortController for very long timeout (10 minutes)
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 minutes timeout
-                
-                const response = await fetch('/api/form-teams', {
+                // Start async team formation
+                const startResponse = await fetch('/api/form-teams-async', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -604,49 +715,126 @@
                         algorithm: algorithm,
                         keywords: selectedKeywords,
                         num_teams: numTeams
-                    }),
-                    signal: controller.signal,
-                    // Keep connection alive for long requests
-                    keepalive: true
+                    })
                 });
                 
-                clearTimeout(timeoutId);
-
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
-
-                let data;
-                const contentType = response.headers.get('content-type');
-                
-                if (contentType && contentType.includes('application/json')) {
-                    data = await response.json();
-                    console.log('Response data:', data);
-                } else {
-                    // If response is not JSON, get it as text for debugging
-                    const textResponse = await response.text();
-                    console.error('Non-JSON response:', textResponse);
-                    throw new Error(`Server returned non-JSON response (${response.status}): ${textResponse.substring(0, 200)}...`);
-                }
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${data.error || 'Unknown server error'}`);
-                }
-
-                // Clear the timer and store keywords for displayResults function
-                if (window.currentTimerInterval) {
-                    clearInterval(window.currentTimerInterval);
-                    window.currentTimerInterval = null;
+                if (!startResponse.ok) {
+                    throw new Error(`Failed to start team formation: ${startResponse.status}`);
                 }
                 
-                window.lastUsedKeywords = [...selectedKeywords];
-                displayResults(data);
-                showStatus('Teams formed successfully!', 'success');
+                const startData = await startResponse.json();
+                if (!startData.success) {
+                    throw new Error(startData.error || 'Failed to start team formation');
+                }
+                
+                const taskId = startData.task_id;
+                console.log('Team formation task started:', taskId);
+                
+                // Poll for results
+                let pollCount = 0;
+                const maxPolls = 180; // 15 minutes max (5-second intervals)
+                
+                const pollForResults = async () => {
+                    try {
+                        const statusResponse = await fetch(`/api/task-status/${taskId}`);
+                        if (!statusResponse.ok) {
+                            throw new Error(`Failed to get task status: ${statusResponse.status}`);
+                        }
+                        
+                        const statusData = await statusResponse.json();
+                        if (!statusData.success) {
+                            throw new Error(statusData.error || 'Failed to get task status');
+                        }
+                        
+                        const status = statusData.task_status;
+                        console.log('Task status:', status);
+                        
+                        // Update progress indicators
+                        if (timerElement) {
+                            timerElement.textContent = status.elapsed_seconds || elapsedSeconds;
+                        }
+                        if (progressBar) {
+                            const progressPercent = Math.min(status.progress || 0, 95);
+                            progressBar.style.width = progressPercent + '%';
+                            
+                            // Update color based on elapsed time
+                            const elapsed = status.elapsed_seconds || 0;
+                            if (elapsed < 60) {
+                                progressBar.style.backgroundColor = '#90ee90';
+                            } else if (elapsed < 180) {
+                                progressBar.style.backgroundColor = '#ffd700';
+                            } else {
+                                progressBar.style.backgroundColor = '#ffb6c1';
+                            }
+                        }
+                        
+                        // Update status message
+                        const loadingDiv = document.querySelector('.loading h3');
+                        if (loadingDiv) {
+                            loadingDiv.innerHTML = `🔄 ${status.message || 'Processing...'}`;
+                        }
+                        
+                        if (status.status === 'completed') {
+                            // Clear the timer
+                            if (window.currentTimerInterval) {
+                                clearInterval(window.currentTimerInterval);
+                                window.currentTimerInterval = null;
+                            }
+                            
+                            // Process results
+                            const result = status.result;
+                            window.lastUsedKeywords = [...selectedKeywords];
+                            displayResults(result);
+                            showStatus('Teams formed successfully!', 'success');
+                            return; // Stop polling
+                            
+                        } else if (status.status === 'failed') {
+                            throw new Error(status.error || 'Team formation failed');
+                            
+                        } else {
+                            // Continue polling
+                            pollCount++;
+                            if (pollCount < maxPolls) {
+                                setTimeout(pollForResults, 5000); // Poll every 5 seconds
+                            } else {
+                                throw new Error('Team formation timed out after 15 minutes');
+                            }
+                        }
+                        
+                    } catch (pollError) {
+                        console.error('Polling error:', pollError);
+                        throw pollError;
+                    }
+                };
+                
+                // Start polling after a short delay
+                setTimeout(pollForResults, 2000);
+                
+                // Don't process response here - wait for polling
+
+                // Async processing - results will be handled by polling
                 
             } catch (error) {
                 console.error('Error details:', error);
                 
                 let errorMessage = 'An unexpected error occurred.';
                 let suggestions = [];
+                
+                if (error.message.includes('Failed to start team formation')) {
+                    errorMessage = 'Failed to start team formation process.';
+                    suggestions = [
+                        'Check your internet connection',
+                        'Verify all form fields are filled correctly',
+                        'Try refreshing the page and try again'
+                    ];
+                } else if (error.message.includes('timed out after')) {
+                    errorMessage = 'Team formation process timed out after 15 minutes.';
+                    suggestions = [
+                        'Try using fewer keywords (3-5 recommended)',
+                        'Try requesting fewer teams',
+                        'Use a simpler algorithm like CAT or ACET',
+                        'The database may need optimization - contact support'
+                    ];
                 
                 if (error.name === 'AbortError') {
                     errorMessage = 'Request timeout: The team formation process took longer than 10 minutes and was cancelled.';
@@ -712,25 +900,7 @@
                         </ul>
                         <p><strong>Recommended Solutions:</strong></p>
                         <ul>${suggestionsList}</ul>
-                        <div style="margin-top: 15px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; color: #856404;">
-                            <strong>💡 Tip:</strong> Neo4j serverless databases can take 2-5 minutes to wake up from cold start. 
-                            If this is your first request in a while, please wait and try again.
-                        </div>
-                    </div>
-                `;
-                
-            } finally {
-                // Clear timer if still running
-                if (window.currentTimerInterval) {
-                    clearInterval(window.currentTimerInterval);
-                    window.currentTimerInterval = null;
-                }
-                
-                // Reset button state
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Form Teams 🚀';
-            }
-        });
+        // End of JavaScript - old code removed for async implementation
 
         function showStatus(message, type = 'info') {
             const statusDiv = document.getElementById('status');
