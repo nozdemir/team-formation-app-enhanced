@@ -489,6 +489,9 @@
         document.getElementById('teamFormationForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
+            // Record start time for performance tracking
+            window.teamFormationStartTime = Date.now();
+
             if (selectedKeywords.length === 0) {
                 showStatus('Please select at least one keyword.', 'error');
                 return;
@@ -621,20 +624,57 @@
                 return;
             }
 
-            let html = `<div class="success">
-                Successfully formed ${data.total_teams} team(s) using ${data.summary?.algorithm_name || data.algorithm}
-            </div>`;
+            // Record end time for performance calculation
+            const endTime = Date.now();
+            const formationTime = window.teamFormationStartTime ? ((endTime - window.teamFormationStartTime) / 1000).toFixed(2) : 'N/A';
+            
+            // Calculate statistics
+            const teams = data.teams || [];
+            const totalTeams = teams.length;
+            const completeTeams = teams.filter(t => (t.completeness || 1) >= 1.0).length;
+            const incompleteTeams = totalTeams - completeTeams;
+            const avgTeamSize = teams.reduce((sum, t) => sum + (t.members || []).length, 0) / totalTeams;
 
-            if (data.summary) {
-                html += `
-                <div style="background-color: #3498db; color: white; padding: 15px; border-radius: 5px; margin: 15px 0;">
-                    <h3 style="margin-top: 0;">📊 Summary</h3>
-                    <p><strong>Keywords:</strong> ${data.summary.keywords_requested.join(', ')}</p>
-                    <p><strong>Success Rate:</strong> ${data.summary.success_rate}</p>
-                    <p><strong>Average Team Size:</strong> ${data.summary.avg_team_size}</p>
-                    <p><strong>Average Completeness:</strong> ${data.summary.avg_completeness}%</p>
-                </div>`;
-            }
+            // Create formatted output with blue-themed summary
+            let html = `
+                <div class="formatted-results">
+                    <!-- Summary Section with Blue Background -->
+                    <div class="card mb-4" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); border: none; color: white;">
+                        <div class="card-body text-center">
+                            <h2 class="mb-3"><i class="fas fa-users"></i> Team Formation Results</h2>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <h4 class="text-warning">${totalTeams}</h4>
+                                    <small>Total Teams</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <h4 class="text-success">${completeTeams}</h4>
+                                    <small>Complete Teams</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <h4 class="text-light">${incompleteTeams}</h4>
+                                    <small>Incomplete Teams</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <h4 class="text-info">${formationTime}s</h4>
+                                    <small>Formation Time</small>
+                                </div>
+                            </div>
+                            <hr class="bg-light">
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <strong>Algorithm:</strong> ${data.summary?.algorithm_name || data.algorithm}
+                                </div>
+                                <div class="col-md-4">
+                                    <strong>Success Rate:</strong> ${Math.round((completeTeams/totalTeams)*100)}%
+                                </div>
+                                <div class="col-md-4">
+                                    <strong>Avg Team Size:</strong> ${avgTeamSize.toFixed(1)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            `;
 
             if (data.teams && data.teams.length > 0) {
                 data.teams.forEach(team => {
