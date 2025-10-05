@@ -591,6 +591,10 @@
                     num_teams: numTeams
                 });
 
+                // Create AbortController for very long timeout (10 minutes)
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 minutes timeout
+                
                 const response = await fetch('/api/form-teams', {
                     method: 'POST',
                     headers: {
@@ -600,8 +604,13 @@
                         algorithm: algorithm,
                         keywords: selectedKeywords,
                         num_teams: numTeams
-                    })
+                    }),
+                    signal: controller.signal,
+                    // Keep connection alive for long requests
+                    keepalive: true
                 });
+                
+                clearTimeout(timeoutId);
 
                 console.log('Response status:', response.status);
                 console.log('Response headers:', response.headers);
@@ -637,37 +646,76 @@
                 console.error('Error details:', error);
                 
                 let errorMessage = 'An unexpected error occurred.';
+                let suggestions = [];
                 
-                if (error.message.includes('HTTP 500')) {
+                if (error.name === 'AbortError') {
+                    errorMessage = 'Request timeout: The team formation process took longer than 10 minutes and was cancelled.';
+                    suggestions = [
+                        'Try using fewer keywords (3-5 recommended)',
+                        'Try requesting fewer teams',
+                        'Switch to a faster algorithm (CAT or ACET)',
+                        'The database may be in cold start - try again in a few minutes'
+                    ];
+                } else if (error.message.includes('HTTP 503')) {
+                    errorMessage = 'Service temporarily unavailable: The server is overloaded or the database is initializing (serverless mode cold start).';
+                    suggestions = [
+                        'Wait 2-3 minutes and try again (database cold start)',
+                        'Try using simpler parameters',
+                        'Check if the service is temporarily down'
+                    ];
+                } else if (error.message.includes('HTTP 500')) {
                     errorMessage = 'Server error: Please check the server logs for more details. The issue might be with the database connection or algorithm execution.';
+                    suggestions = [
+                        'Try a different algorithm',
+                        'Use fewer or different keywords',
+                        'Contact system administrator'
+                    ];
                 } else if (error.message.includes('HTTP 400')) {
                     errorMessage = 'Invalid request: Please check your input parameters.';
-                } else if (error.message.includes('Failed to fetch')) {
+                    suggestions = [
+                        'Verify all form fields are filled correctly',
+                        'Check keyword selection (max 10)',
+                        'Ensure number of teams is reasonable (1-20)'
+                    ];
+                } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
                     errorMessage = 'Network error: Please check your internet connection and try again.';
+                    suggestions = [
+                        'Check your internet connection',
+                        'Try refreshing the page',
+                        'Wait a moment and try again'
+                    ];
                 } else {
                     errorMessage = error.message;
+                    suggestions = [
+                        'Try refreshing the page',
+                        'Contact support if the problem persists'
+                    ];
                 }
                 
                 showStatus(`❌ Team formation failed: ${errorMessage}`, 'error');
                 
-                // Show error in results area
+                // Show error in results area with dynamic suggestions
+                const suggestionsList = suggestions.length > 0 ? 
+                    suggestions.map(s => `<li>${s}</li>`).join('') :
+                    '<li>Try using fewer keywords</li><li>Try requesting fewer teams</li><li>Contact support if the problem persists</li>';
+                
                 resultsDiv.innerHTML = `
                     <div style="background-color: #f8d7da; color: #721c24; padding: 20px; border-radius: 5px; border: 1px solid #f5c6cb;">
                         <h3>❌ Error Details</h3>
                         <p><strong>Error:</strong> ${errorMessage}</p>
-                        <p><strong>Parameters:</strong></p>
+                        <p><strong>Parameters Used:</strong></p>
                         <ul>
                             <li>Algorithm: ${algorithm}</li>
                             <li>Keywords: ${selectedKeywords.join(', ')}</li>
                             <li>Number of Teams: ${numTeams}</li>
+                            <li>Request Duration: ${elapsedSeconds}s</li>
                         </ul>
-                        <p><strong>Suggestions:</strong></p>
-                        <ul>
-                            <li>Try using fewer keywords</li>
-                            <li>Try requesting fewer teams</li>
-                            <li>Check the browser console (F12) for more details</li>
-                            <li>Contact the system administrator if the problem persists</li>
-                        </ul>
+                        <p><strong>Recommended Solutions:</strong></p>
+                        <ul>${suggestionsList}</ul>
+                        <div style="margin-top: 15px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; color: #856404;">
+                            <strong>💡 Tip:</strong> Neo4j serverless databases can take 2-5 minutes to wake up from cold start. 
+                            If this is your first request in a while, please wait and try again.
+                        </div>
                     </div>
                 `;
                 

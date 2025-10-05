@@ -269,7 +269,8 @@ class ScientificTeamFormation:
             result = tx.run(
                 query, 
                 skill=first_keyword,
-                limit=limit
+                limit=limit,
+                timeout=180  # 3 minute timeout for serverless mode
             )
             data = result.values()
             logger.info(f"filter_authors_with_high_citation_connections found {len(data)} authors in {time.time() - method_start:.2f}s")
