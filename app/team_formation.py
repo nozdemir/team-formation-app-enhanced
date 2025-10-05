@@ -109,15 +109,15 @@ class ScientificTeamFormation:
             
             logger.info(f"Connecting to Neo4j at: {neo4j_uri}")
             
-            # Configure timeouts for serverless mode (AuraDB with Graph Analytics Serverless)
+            # Configure extended timeouts for serverless mode (AuraDB with Graph Analytics Serverless)
             self.driver = GraphDatabase.driver(
                 neo4j_uri, 
                 auth=(neo4j_user, neo4j_password),
-                # Increased timeouts for serverless graph analytics
-                connection_timeout=60.0,  # 60 seconds for initial connection
-                max_connection_lifetime=300.0,  # 5 minutes max connection lifetime
-                max_connection_pool_size=10,
-                connection_acquisition_timeout=120.0  # 2 minutes to acquire connection
+                # Much longer timeouts for complex team formation algorithms
+                connection_timeout=180.0,  # 3 minutes for initial connection
+                max_connection_lifetime=600.0,  # 10 minutes max connection lifetime
+                max_connection_pool_size=15,
+                connection_acquisition_timeout=300.0  # 5 minutes to acquire connection
             )
             
             # Test connection with increased timeout
@@ -1203,8 +1203,8 @@ class ScientificTeamFormation:
                     fetch_size=1000,
                     connection_acquisition_timeout=120
                 ) as session:
-                    # Use extended timeout for queries in serverless mode
-                    test_result = session.run("MATCH (a:Author) RETURN count(a) as total_authors LIMIT 1", timeout=90)
+                    # Use much longer timeout for queries in serverless mode
+                    test_result = session.run("MATCH (a:Author) RETURN count(a) as total_authors LIMIT 1", timeout=180)
                     author_record = test_result.single()
                     author_count = author_record["total_authors"] if author_record else 0
                     logger.info(f"Database connectivity test: Found {author_count} total authors")
@@ -1221,7 +1221,7 @@ class ScientificTeamFormation:
                     LIMIT 5
                     """
                     
-                    test_result = session.run(test_keyword_query, keyword=keywords[0], timeout=90)
+                    test_result = session.run(test_keyword_query, keyword=keywords[0], timeout=180)
                     test_authors = list(test_result)
                     logger.info(f"Test search for '{keywords[0]}' found {len(test_authors)} authors")
                     for author in test_authors[:3]:

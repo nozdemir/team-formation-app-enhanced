@@ -527,15 +527,62 @@
             submitBtn.disabled = true;
             submitBtn.textContent = '🔄 Forming Teams...';
             
-            // Show loading in results area ...
+            // Show loading in results area with real-time counter
             resultsDiv.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    <p>Forming teams using ${algorithm.replace('_', ' ')} algorithm...</p>
-                    <p>Keywords: ${selectedKeywords.join(', ')}</p>
+                    <h3 style="color: #2a5298; margin-bottom: 15px;">🔄 Forming Teams...</h3>
+                    <p style="font-size: 16px; margin-bottom: 10px;">Algorithm: <strong>${algorithm.replace('_', ' ')}</strong></p>
+                    <p style="font-size: 14px; margin-bottom: 20px;">Keywords: <strong>${selectedKeywords.join(', ')}</strong></p>
+                    
+                    <div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                        <div style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">
+                            ⏱️ <span id="elapsedTimer">0</span> seconds
+                        </div>
+                        <div style="font-size: 12px; opacity: 0.9;">
+                            Processing time (serverless mode may take up to 5 minutes)
+                        </div>
+                        <div style="width: 100%; background-color: rgba(255,255,255,0.3); border-radius: 10px; height: 8px; margin-top: 10px; overflow: hidden;">
+                            <div id="progressBar" style="width: 0%; background-color: #90ee90; height: 100%; border-radius: 10px; transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                    
+                    <p style="font-size: 12px; color: #666; margin-top: 15px;">
+                        <i class="fas fa-info-circle"></i> Please wait... Complex algorithms may take longer in serverless mode
+                    </p>
                 </div>
             `;
             resultsDiv.style.display = 'block';
+            
+            // Start the elapsed time counter
+            let elapsedSeconds = 0;
+            const timerElement = document.getElementById('elapsedTimer');
+            const progressBar = document.getElementById('progressBar');
+            const maxExpectedTime = 360; // 6 minutes max expected time
+            
+            const timerInterval = setInterval(() => {
+                elapsedSeconds++;
+                if (timerElement) {
+                    timerElement.textContent = elapsedSeconds;
+                }
+                if (progressBar) {
+                    // Progress bar fills up over 5 minutes, but doesn't mean it will finish then
+                    const progressPercent = Math.min((elapsedSeconds / maxExpectedTime) * 100, 95);
+                    progressBar.style.width = progressPercent + '%';
+                    
+                    // Change color as time progresses
+                    if (elapsedSeconds < 60) {
+                        progressBar.style.backgroundColor = '#90ee90'; // Green for first minute
+                    } else if (elapsedSeconds < 180) {
+                        progressBar.style.backgroundColor = '#ffd700'; // Yellow for 1-3 minutes
+                    } else {
+                        progressBar.style.backgroundColor = '#ffb6c1'; // Light red for 3+ minutes
+                    }
+                }
+            }, 1000);
+            
+            // Store the interval ID to clear it later
+            window.currentTimerInterval = timerInterval;
 
             try {
                 console.log('Sending request:', {
@@ -576,7 +623,12 @@
                     throw new Error(`HTTP ${response.status}: ${data.error || 'Unknown server error'}`);
                 }
 
-                // Store keywords for displayResults function
+                // Clear the timer and store keywords for displayResults function
+                if (window.currentTimerInterval) {
+                    clearInterval(window.currentTimerInterval);
+                    window.currentTimerInterval = null;
+                }
+                
                 window.lastUsedKeywords = [...selectedKeywords];
                 displayResults(data);
                 showStatus('Teams formed successfully!', 'success');
@@ -620,6 +672,13 @@
                 `;
                 
             } finally {
+                // Clear timer if still running
+                if (window.currentTimerInterval) {
+                    clearInterval(window.currentTimerInterval);
+                    window.currentTimerInterval = null;
+                }
+                
+                // Reset button state
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Form Teams 🚀';
             }

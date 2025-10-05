@@ -1,1 +1,1 @@
-web: gunicorn wsgi:app --timeout 180 --keep-alive 5 --max-requests 1000 --max-requests-jitter 100
+web: gunicorn wsgi:app --timeout 300 --keep-alive 10 --max-requests 500 --max-requests-jitter 50 --worker-connections 1000
