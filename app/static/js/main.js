@@ -60,6 +60,9 @@ function displayResults(data) {
     const teams = data.teams || data.result || data;
     const summary = data.summary || {};
     
+    // Store globally for Google Forms integration
+    window.currentTeamResults = teams;
+    
     // Fix: Ensure teams is always an array
     if (!teams) {
         resultsDiv.innerHTML = '<div class="alert alert-warning">No teams could be formed with the given criteria.</div>';
@@ -69,6 +72,7 @@ function displayResults(data) {
     // Convert single team object to array if needed
     if (!Array.isArray(teams)) {
         teams = [teams];  // Wrap single team in array
+        window.currentTeamResults = teams;
     }
     
     if (teams.length === 0) {
@@ -150,12 +154,48 @@ function displayResults(data) {
         html += '</div>';
     });
     
-    // Add Google Forms integration
+    // Add Google Forms integration with your actual survey
     html += `
-        <div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
-            <h4>📝 Help Us Improve - Evaluate This Team Formation</h4>
-            <p>Your feedback is valuable for our scientific research. Please take 2-3 minutes to evaluate the team formation results.</p>
-            <p><a href="https://forms.google.com/your-form-link" target="_blank" class="btn btn-primary">Provide Feedback</a></p>
+        <div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #f0fff4 0%, #f8fff9 100%); border: 2px solid #28a745; border-radius: 10px;">
+            <div class="text-center">
+                <h4 style="color: #28a745; margin-bottom: 15px;">
+                    <i class="fas fa-chart-line"></i> Help Us Improve - Evaluate This Team Formation
+                </h4>
+                <p style="margin-bottom: 20px; color: #155724;">
+                    <strong>Your feedback is valuable for our scientific research.</strong><br>
+                    Please take 2-3 minutes to evaluate the team formation results.
+                </p>
+                
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <button onclick="openFeedbackForm()" class="btn btn-success btn-lg me-3" style="min-width: 180px;">
+                            <i class="fas fa-clipboard-list"></i> Provide Feedback
+                        </button>
+                        <button onclick="copyTeamResults()" class="btn btn-outline-primary">
+                            <i class="fas fa-copy"></i> Copy Results
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Embedded form option -->
+                <div class="mt-3">
+                    <small class="text-muted">
+                        Prefer embedded form? 
+                        <a href="#" onclick="showEmbeddedForm(); return false;" style="color: #28a745;">
+                            Click here to open form below
+                        </a>
+                    </small>
+                </div>
+                
+                <!-- Embedded form container (initially hidden) -->
+                <div id="embeddedFormContainer" style="display: none; margin-top: 20px;">
+                    <hr>
+                    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfjqhqiC3mDT3UU2R5oupe08Kr5ESuNTseKPQbEbwjPMumnRw/viewform?embedded=true" 
+                            width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">
+                        Loading feedback form...
+                    </iframe>
+                </div>
+            </div>
         </div>
     `;
     
@@ -166,4 +206,331 @@ function displayResults(data) {
 function displayError(message) {
     document.getElementById('results').innerHTML = 
         `<div class="alert alert-danger">Error: ${message}</div>`;
+}
+
+// Google Forms Integration Functions
+function openFeedbackForm() {
+    const teamsData = getCurrentTeamResults();
+    
+    if (!teamsData || teamsData.length === 0) {
+        alert('No team formation results available. Please form teams first.');
+        return;
+    }
+    
+    // Get feedback form URL from configuration
+    const feedbackFormUrl = CONFIG?.FEEDBACK_FORM_URL || 'https://forms.gle/your-survey-link';
+    
+    // Optional: Add team formation context as URL parameters if your form supports it
+    const urlParams = new URLSearchParams();
+    urlParams.append('teams_count', teamsData.length);
+    urlParams.append('algorithm', teamsData[0]?.algorithm || 'unknown');
+    urlParams.append('timestamp', new Date().toISOString());
+    
+    const finalUrl = `${feedbackFormUrl}?${urlParams.toString()}`;
+    
+    // Open the feedback form in a new tab
+    window.open(finalUrl, '_blank');
+    
+    // Show a thank you message
+    setTimeout(() => {
+        showNotification('Thank you for providing feedback! Your input helps us improve our team formation algorithms.', 'success');
+    }, 1000);
+}
+
+function openEmbeddedFeedback() {
+    const teamsData = getCurrentTeamResults();
+    
+    if (!teamsData || teamsData.length === 0) {
+        alert('No team formation results available. Please form teams first.');
+        return false;
+    }
+    
+    // Optionally add team data to iframe URL parameters
+    const iframe = document.getElementById('feedbackIframe');
+    const baseUrl = CONFIG?.FEEDBACK_FORM_URL || 'https://docs.google.com/forms/d/e/1FAIpQLSfjqhqiC3mDT3UU2R5oupe08Kr5ESuNTseKPQbEbwjPMumnRw/viewform';
+    
+    // Add context parameters if supported by your form
+    const urlParams = new URLSearchParams();
+    urlParams.append('teams_count', teamsData.length);
+    urlParams.append('algorithm', teamsData[0]?.algorithm || 'unknown');
+    urlParams.append('embedded', 'true');
+    
+    const embeddedUrl = `${baseUrl}?embedded=true&${urlParams.toString()}`;
+    iframe.src = embeddedUrl;
+    
+    return true;
+}
+
+function exportToGoogleForms() {
+    // This is the old function, now redirecting to the main feedback form
+    openFeedbackForm();
+}
+
+function generateTeamEvaluationForm() {
+    const teamsData = getCurrentTeamResults();
+    
+    if (!teamsData || teamsData.length === 0) {
+        alert('No team formation results available. Please form teams first.');
+        return;
+    }
+    
+    // Use your actual Google Forms survey URL
+    // You can add team data as URL parameters if your form supports pre-filling
+    const evaluationUrl = 'https://forms.gle/your-actual-form-id'; // Replace with your actual form URL
+    
+    window.open(evaluationUrl, '_blank');
+    
+    // Optional: Show success message
+    setTimeout(() => {
+        alert('Thank you for providing feedback! Your input helps improve our team formation algorithms.');
+    }, 1000);
+}
+
+function generateGoogleFormLink() {
+    const title = document.getElementById('googleFormTitle')?.value || 'Team Formation Results';
+    const description = document.getElementById('googleFormDescription')?.value || 'Team formation results for evaluation.';
+    const teamsData = getCurrentTeamResults();
+    
+    if (!teamsData) {
+        alert('No team formation results available.');
+        return;
+    }
+    
+    const formUrl = generateGoogleFormUrl(title, description, teamsData);
+    displayGeneratedLink(formUrl);
+}
+
+function generateGoogleFormUrl(title, description, teamsData) {
+    const baseUrl = 'https://docs.google.com/forms/d/e/create';
+    const params = new URLSearchParams();
+    
+    // Add form title and description
+    params.append('title', title);
+    params.append('description', description);
+    
+    // Add team data as pre-filled content
+    teamsData.forEach((team, index) => {
+        params.append(`team_${index + 1}_name`, team.team_name || `Team ${index + 1}`);
+        params.append(`team_${index + 1}_members`, team.members.map(m => m.author_name).join(', '));
+        params.append(`team_${index + 1}_skills`, (team.skills_covered || []).join(', '));
+        params.append(`team_${index + 1}_status`, team.status || 'unknown');
+    });
+    
+    return `${baseUrl}?${params.toString()}`;
+}
+
+function copyTeamResults() {
+    const teamsData = getCurrentTeamResults();
+    
+    if (!teamsData || teamsData.length === 0) {
+        alert('No team formation results available to copy.');
+        return;
+    }
+    
+    // Format team results as text
+    let resultText = `Team Formation Results\n`;
+    resultText += `Generated on: ${new Date().toLocaleString()}\n\n`;
+    
+    teamsData.forEach((team, index) => {
+        resultText += `=== ${team.team_name || 'Team ' + (index + 1)} ===\n`;
+        resultText += `Status: ${team.status || 'Unknown'}\n`;
+        resultText += `Algorithm: ${team.algorithm || 'N/A'}\n`;
+        resultText += `Skills Covered: ${(team.skills_covered || []).join(', ')}\n`;
+        resultText += `Members (${team.members ? team.members.length : 0}):\n`;
+        
+        if (team.members) {
+            team.members.forEach((member, memberIndex) => {
+                resultText += `  ${memberIndex + 1}. ${member.author_name}\n`;
+                resultText += `     Added For: ${member.added_for || member.role || 'N/A'}\n`;
+                resultText += `     Skills: ${member.all_skills || 'N/A'}\n`;
+                resultText += `     Papers: ${member.paper_count || 0}\n`;
+                resultText += `     Organizations: ${(member.organizations || []).join(', ') || 'N/A'}\n`;
+                resultText += `     Citations: ${member.total_citations || 0}\n\n`;
+            });
+        }
+        resultText += `\n`;
+    });
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(resultText).then(() => {
+        alert('Team results copied to clipboard!');
+    }).catch(err => {
+        console.error('Failed to copy text: ', err);
+        alert('Failed to copy to clipboard. Please try again.');
+    });
+}
+
+function copyGeneratedLink() {
+    const linkInput = document.getElementById('generatedLink');
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999); // For mobile devices
+    
+    navigator.clipboard.writeText(linkInput.value).then(() => {
+        alert('Google Form link copied to clipboard!');
+    }).catch(err => {
+        console.error('Failed to copy link: ', err);
+        alert('Failed to copy link. Please manually copy from the text field.');
+    });
+}
+
+function displayGeneratedLink(url) {
+    const container = document.getElementById('generatedLinkContainer');
+    const linkInput = document.getElementById('generatedLink');
+    
+    if (container && linkInput) {
+        linkInput.value = url;
+        container.style.display = 'block';
+    }
+}
+
+function getCurrentTeamResults() {
+    // This function should return the current team formation results
+    // For now, we'll try to extract from the results div or from a global variable
+    
+    // Try to get from global variable if set
+    if (window.currentTeamResults) {
+        return window.currentTeamResults;
+    }
+    
+    // Try to extract from the displayed results (simplified)
+    const resultsDiv = document.getElementById('results');
+    if (!resultsDiv || !resultsDiv.innerHTML.trim()) {
+        return null;
+    }
+    
+    // Return mock data structure for demonstration
+    return [
+        {
+            team_name: 'Sample Team 1',
+            team_number: 1,
+            status: 'complete',
+            algorithm: 'ACET',
+            skills_covered: ['machine learning', 'data mining'],
+            requested_skills: ['machine learning', 'data mining', 'optimization'],
+            members: [
+                {
+                    author_name: 'Sample Author 1',
+                    added_for: 'machine learning',
+                    all_skills: 'machine learning, neural networks, deep learning',
+                    paper_count: 15,
+                    organizations: ['University A', 'Research Lab B'],
+                    total_citations: 250
+                }
+            ]
+        }
+    ];
+}
+
+// Additional utility functions
+function exportTeamSummary() {
+    const teamsData = getCurrentTeamResults();
+    
+    if (!teamsData || teamsData.length === 0) {
+        alert('No team formation results available to export.');
+        return;
+    }
+    
+    // Generate CSV format summary
+    let csvContent = "Team,Algorithm,Status,Members Count,Skills Covered,Total Papers,Total Citations\n";
+    
+    teamsData.forEach((team, index) => {
+        const memberCount = team.members ? team.members.length : 0;
+        const skillsCovered = (team.skills_covered || []).join('; ');
+        const totalPapers = team.members ? team.members.reduce((sum, m) => sum + (m.paper_count || 0), 0) : 0;
+        const totalCitations = team.members ? team.members.reduce((sum, m) => sum + (m.total_citations || 0), 0) : 0;
+        
+        csvContent += `"${team.team_name || 'Team ' + (index + 1)}","${team.algorithm}","${team.status}",${memberCount},"${skillsCovered}",${totalPapers},${totalCitations}\n`;
+    });
+    
+    // Download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `team_formation_summary_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showNotification('Team summary exported successfully!', 'success');
+}
+
+function shareResults() {
+    const teamsData = getCurrentTeamResults();
+    
+    if (!teamsData || teamsData.length === 0) {
+        alert('No team formation results available to share.');
+        return;
+    }
+    
+    // Generate shareable text
+    const shareText = `Team Formation Results:\n${teamsData.length} teams formed using ${teamsData[0]?.algorithm || 'advanced'} algorithm.\n\nView details at: ${window.location.href}`;
+    
+    if (navigator.share) {
+        // Use Web Share API if available
+        navigator.share({
+            title: 'Team Formation Results',
+            text: shareText,
+            url: window.location.href
+        });
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(shareText).then(() => {
+            showNotification('Results link copied to clipboard!', 'info');
+        }).catch(() => {
+            alert('Share link: ' + window.location.href);
+        });
+    }
+}
+
+function downloadPDF() {
+    const teamsData = getCurrentTeamResults();
+    
+    if (!teamsData || teamsData.length === 0) {
+        alert('No team formation results available to download.');
+        return;
+    }
+    
+    // For now, just show a placeholder message
+    // You would implement actual PDF generation here using libraries like jsPDF
+    showNotification('PDF download feature will be implemented soon. Use "Copy Results" for now.', 'info');
+}
+
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.zIndex = '9999';
+    notification.style.minWidth = '300px';
+    
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+function showEmbeddedForm() {
+    const container = document.getElementById('embeddedFormContainer');
+    if (container) {
+        container.style.display = container.style.display === 'none' ? 'block' : 'none';
+        
+        // Scroll to the form if showing it
+        if (container.style.display === 'block') {
+            setTimeout(() => {
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+        }
+    }
 }

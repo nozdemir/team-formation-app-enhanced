@@ -903,6 +903,53 @@ class ScientificTeamFormation:
             logger.error(f"Error in get_member_details: {e}")
             return []
 
+    def get_enhanced_member_details(self, tx, author_ids: List[str]) -> List[Dict]:
+        """Get enhanced detailed information about specific authors including papers, organizations, and all skills."""
+        query = """
+        MATCH (a:Author)
+        WHERE a.Author_ID IN $author_ids
+        
+        // Get paper count
+        OPTIONAL MATCH (a)-[:WRITTEN]->(p:Paper)
+        WITH a, COUNT(DISTINCT p) as paper_count
+        
+        // Get organizations
+        OPTIONAL MATCH (a)-[:WORKS_IN]->(org)
+        WITH a, paper_count, COLLECT(DISTINCT org.Org_Name) + COLLECT(DISTINCT org.Dept_Name) AS organizations
+        
+        // Get citation count
+        OPTIONAL MATCH (a)-[:WRITTEN]->(paper:Paper)
+        WITH a, paper_count, organizations, SUM(COALESCE(paper.n_Citation, 0)) AS total_citations
+        
+        RETURN a.Author_ID AS author_id, 
+               a.Author_Name AS author_name, 
+               a.skills AS skills,
+               paper_count,
+               [org IN organizations WHERE org IS NOT NULL] AS organizations,
+               total_citations
+        ORDER BY a.Author_Name
+        """
+        
+        try:
+            result = tx.run(query, author_ids=author_ids)
+            enhanced_details = []
+            
+            for record in result:
+                author_detail = {
+                    'author_id': record['author_id'],
+                    'author_name': record['author_name'],
+                    'skills': record['skills'] or '',
+                    'paper_count': record['paper_count'] or 0,
+                    'organizations': record['organizations'] or [],
+                    'total_citations': record['total_citations'] or 0
+                }
+                enhanced_details.append(author_detail)
+                
+            return enhanced_details
+        except Exception as e:
+            logger.error(f"Error in get_enhanced_member_details: {e}")
+            return []
+
     def find_matching_skills(self, skills_str: str, keywords: List[str]) -> List[str]:
         """Find skills from an author that match any of the required keywords."""
         if not skills_str:
@@ -930,9 +977,13 @@ class ScientificTeamFormation:
         if team:
             with self.driver.session() as session:
                 try:
-                    members_details = session.execute_read(self.get_member_details, team)
+                    members_details = session.execute_read(self.get_enhanced_member_details, team)
 
-                    for member_id, name, skills in members_details:
+                    for member_detail in members_details:
+                        member_id = member_detail['author_id']
+                        name = member_detail['author_name']
+                        skills = member_detail['skills']
+                        
                         matching_skills = self.find_matching_skills(skills, keywords)
                         matching_skill_str = ", ".join(matching_skills) if matching_skills else "No matching skills"
                         
@@ -1118,18 +1169,38 @@ class ScientificTeamFormation:
                         team_skills = set()
                         team_status = "complete"
                         
+                        # Get enhanced details for team members
+                        team_member_ids = [str(row.get('Author ID', '')) for _, row in team_data.iterrows()]
+                        
+                        with self.driver.session() as session:
+                            enhanced_details = session.execute_read(self.get_enhanced_member_details, team_member_ids)
+                            
+                        # Create a mapping of author_id to enhanced details
+                        details_map = {detail['author_id']: detail for detail in enhanced_details}
+                        
                         for _, row in team_data.iterrows():
                             author_id = str(row.get('Author ID', ''))
                             author_name = str(row.get('Author Name', 'Unknown Author'))
                             matching_skills = str(row.get('Matching Skills', ''))
                             added_for_skill = str(row.get('Added For Skill', 'Team Member'))
                             
+                            # Get enhanced details for this member
+                            enhanced_detail = details_map.get(author_id, {})
+                            all_skills = enhanced_detail.get('skills', '')
+                            paper_count = enhanced_detail.get('paper_count', 0)
+                            organizations = enhanced_detail.get('organizations', [])
+                            total_citations = enhanced_detail.get('total_citations', 0)
+                            
                             members.append({
                                 "author_id": author_id,
                                 "author_name": author_name,
                                 "expertise": matching_skills,
-                                "role": added_for_skill,
-                                "paper_count": 0
+                                "added_for": added_for_skill,
+                                "all_skills": all_skills,
+                                "paper_count": paper_count,
+                                "organizations": organizations,
+                                "total_citations": total_citations,
+                                "role": added_for_skill
                             })
                             
                             if matching_skills and matching_skills != 'nan':
