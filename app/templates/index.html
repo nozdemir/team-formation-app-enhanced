@@ -628,12 +628,25 @@
             const endTime = Date.now();
             const formationTime = window.teamFormationStartTime ? ((endTime - window.teamFormationStartTime) / 1000).toFixed(2) : 'N/A';
             
-            // Calculate statistics
+            // Calculate statistics with correct completeness logic
             const teams = data.teams || [];
             const totalTeams = teams.length;
-            const completeTeams = teams.filter(t => (t.completeness || 1) >= 1.0).length;
+            const allRequestedKeywords = (document.getElementById('keywords')?.value || '').split(',').map(k => k.trim()).filter(k => k);
+            
+            // Calculate team completeness based on keyword coverage
+            let completeTeams = 0;
+            teams.forEach(team => {
+                const coveredKeywords = team.skills_covered || [];
+                const missingKeywords = allRequestedKeywords.filter(keyword => 
+                    !coveredKeywords.some(covered => covered.toLowerCase().includes(keyword.toLowerCase()))
+                );
+                if (missingKeywords.length === 0 && allRequestedKeywords.length > 0) {
+                    completeTeams++;
+                }
+            });
+            
             const incompleteTeams = totalTeams - completeTeams;
-            const avgTeamSize = teams.reduce((sum, t) => sum + (t.members || []).length, 0) / totalTeams;
+            const avgTeamSize = totalTeams > 0 ? teams.reduce((sum, t) => sum + (t.members || []).length, 0) / totalTeams : 0;
 
             // Create formatted output with improved summary section
             let html = `
@@ -699,17 +712,18 @@
                     const members = team.members || [];
                     const requiredSize = parseInt(document.getElementById('team_size')?.value || 5);
                     const currentSize = members.length;
-                    const isComplete = (team.completeness || 1) >= 1.0;
-                    const completionStatus = isComplete ? 'Complete' : 'Incomplete';
-                    const statusColor = isComplete ? '#90ee90' : '#ffb6c1';
-                    const statusIcon = isComplete ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
                     
-                    // Calculate missing keywords
-                    const allRequestedKeywords = (document.getElementById('keywords')?.value || '').split(',').map(k => k.trim()).filter(k => k);
+                    // Calculate team completeness based on keyword coverage
                     const coveredKeywords = team.skills_covered || [];
                     const missingKeywords = allRequestedKeywords.filter(keyword => 
                         !coveredKeywords.some(covered => covered.toLowerCase().includes(keyword.toLowerCase()))
                     );
+                    
+                    // Team is complete only if ALL keywords are covered
+                    const isComplete = missingKeywords.length === 0 && allRequestedKeywords.length > 0;
+                    const completionStatus = isComplete ? 'Complete' : 'Incomplete';
+                    const statusColor = isComplete ? '#90ee90' : '#ffb6c1';
+                    const statusIcon = isComplete ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
                     
                     html += `
                     <div class="team">
@@ -756,19 +770,25 @@
                         </div>
                         <div class="member">
                             <strong>Keywords Covered:</strong>
-                            <div>${coveredKeywords.map(skill => 
+                            <div>${coveredKeywords.length > 0 ? coveredKeywords.map(skill => 
                                 `<span class="keyword-tag">${skill}</span>`
-                            ).join(' ')}</div>
+                            ).join(' ') : '<span style="color: #999; font-style: italic;">No keywords covered</span>'}</div>
                         </div>`;
                     
-                    // Show missing keywords if any
-                    if (missingKeywords.length > 0) {
+                    // Always show missing keywords for incomplete teams, or show "All keywords covered" for complete teams
+                    if (!isComplete && missingKeywords.length > 0) {
                         html += `
                         <div class="member">
                             <strong>Missing Keywords:</strong>
                             <div>${missingKeywords.map(skill => 
-                                `<span class="keyword-tag" style="background-color: #ffb6c1; color: #333;">${skill}</span>`
+                                `<span class="keyword-tag" style="background-color: #ffb6c1; color: #333; border: 1px solid #ff9999;">${skill}</span>`
                             ).join(' ')}</div>
+                        </div>`;
+                    } else if (isComplete) {
+                        html += `
+                        <div class="member">
+                            <strong>Keyword Coverage:</strong>
+                            <div><span style="color: #28a745; font-weight: bold;"><i class="fas fa-check"></i> All requested keywords covered</span></div>
                         </div>`;
                     }
                         
