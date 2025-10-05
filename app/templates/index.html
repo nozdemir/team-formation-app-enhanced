@@ -742,17 +742,33 @@
                                 </span>
                                 <br>
                                 <small style="color: #666; margin-top: 5px; display: block;">
-                                    ${currentSize}/${requiredSize} members (${requiredSize} keywords)
+                                    Found ${currentSize}/${requiredSize} members
+                                </small>
+                                <small style="color: #888; font-size: 11px; display: block;">
+                                    (Team size = ${requiredSize} keywords)
                                 </small>
                             </div>
                         </div>
                         
                         <div class="member">
-                            <strong>Members:</strong>
+                            <strong>Members (ordered by keyword):</strong>
                             <ul style="padding-left: 20px;">`;
                     
+                    // Sort members by keyword order (based on added_for matching keyword order)
+                    const sortedMembers = [...members].sort((a, b) => {
+                        const aKeywordIndex = allRequestedKeywords.findIndex(k => 
+                            k.toLowerCase().includes((a.added_for || '').toLowerCase()) ||
+                            (a.added_for || '').toLowerCase().includes(k.toLowerCase())
+                        );
+                        const bKeywordIndex = allRequestedKeywords.findIndex(k => 
+                            k.toLowerCase().includes((b.added_for || '').toLowerCase()) ||
+                            (b.added_for || '').toLowerCase().includes(k.toLowerCase())
+                        );
+                        return (aKeywordIndex === -1 ? 999 : aKeywordIndex) - (bKeywordIndex === -1 ? 999 : bKeywordIndex);
+                    });
+                    
                     // Enhanced member display with detailed information
-                    members.forEach(member => {
+                    sortedMembers.forEach((member, memberIndex) => {
                         const name = member.author_name || 'Unknown Author';
                         const role = member.role || 'Member';
                         const addedFor = member.added_for || role;
@@ -761,8 +777,18 @@
                         const organizations = member.organizations || [];
                         const citations = member.total_citations || 0;
                         
+                        // Find which keyword this member represents
+                        const keywordIndex = allRequestedKeywords.findIndex(k => 
+                            k.toLowerCase().includes(addedFor.toLowerCase()) ||
+                            addedFor.toLowerCase().includes(k.toLowerCase())
+                        );
+                        const keywordLabel = keywordIndex >= 0 ? `Keyword ${keywordIndex + 1}: ${allRequestedKeywords[keywordIndex]}` : 'Additional Member';
+                        
                         html += `
                                 <li style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                    <div style="background-color: #f8f9fa; padding: 5px; margin-bottom: 8px; border-radius: 3px; font-size: 12px; color: #495057;">
+                                        ${keywordLabel}
+                                    </div>
                                     <strong>${name}</strong> (${role})<br>
                                     <strong>Added For:</strong> <span style="background-color: #e3f2fd; padding: 2px 6px; border-radius: 3px;">${addedFor}</span><br>
                                     <strong>Skills:</strong> ${skills}<br>
@@ -782,22 +808,22 @@
                             ).join(' ') : '<span style="color: #999; font-style: italic;">No keywords covered</span>'}</div>
                         </div>`;
                     
-                    // Always show missing keywords for incomplete teams, or show "All keywords covered" for complete teams
-                    if (!isComplete && missingKeywords.length > 0) {
-                        html += `
+                    // Always show missing keywords section
+                    html += `
                         <div class="member">
                             <strong>Missing Keywords:</strong>
-                            <div>${missingKeywords.map(skill => 
-                                `<span class="keyword-tag" style="background-color: #ffb6c1; color: #333; border: 1px solid #ff9999;">${skill}</span>`
-                            ).join(' ')}</div>
-                        </div>`;
-                    } else if (isComplete) {
-                        html += `
-                        <div class="member">
-                            <strong>Keyword Coverage:</strong>
-                            <div><span style="color: #28a745; font-weight: bold;"><i class="fas fa-check"></i> All requested keywords covered</span></div>
-                        </div>`;
+                            <div>`;
+                    
+                    if (missingKeywords.length > 0) {
+                        html += missingKeywords.map(skill => 
+                            `<span class="keyword-tag" style="background-color: #ffb6c1; color: #333; border: 1px solid #ff9999;">${skill}</span>`
+                        ).join(' ');
+                    } else {
+                        html += `<span style="color: #28a745; font-weight: bold;"><i class="fas fa-check"></i> "" (All keywords found)</span>`;
                     }
+                    
+                    html += `</div>
+                        </div>`;
                         
                     if (team.requested_skills && team.requested_skills.length > 0) {
                         html += `
