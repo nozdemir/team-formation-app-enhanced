@@ -29,6 +29,11 @@ def index():
     """Home page"""
     return render_template('index.html')
 
+@main.route('/about')
+def about():
+    """About page"""
+    return render_template('about.html')
+
 @main.route('/test')
 def test():
     """Simple test route"""

@@ -909,24 +909,28 @@ class ScientificTeamFormation:
         MATCH (a:Author)
         WHERE a.Author_ID IN $author_ids
         
-        // Get paper count
+        // Get paper count and citation count
         OPTIONAL MATCH (a)-[:WRITTEN]->(p:Paper)
-        WITH a, COUNT(DISTINCT p) as paper_count
+        WITH a, COUNT(DISTINCT p) as paper_count, SUM(COALESCE(p.n_Citation, 0)) AS total_citations
         
-        // Get organizations
-        OPTIONAL MATCH (a)-[:WORKS_IN]->(org)
-        WITH a, paper_count, COLLECT(DISTINCT org.Org_Name) + COLLECT(DISTINCT org.Dept_Name) AS organizations
+        // Get organizations and departments
+        OPTIONAL MATCH (a)-[:WORKS_IN]->(org:Organization)
+        OPTIONAL MATCH (a)-[:WORKS_IN]->(dept:Department)
         
-        // Get citation count
-        OPTIONAL MATCH (a)-[:WRITTEN]->(paper:Paper)
-        WITH a, paper_count, organizations, SUM(COALESCE(paper.n_Citation, 0)) AS total_citations
+        // Also check for organizations through departments
+        OPTIONAL MATCH (a)-[:WORKS_IN]->(dept2:Department)<-[:INCLUDES]-(parent_org:Organization)
+        
+        WITH a, paper_count, total_citations,
+             COLLECT(DISTINCT org.Org_Name) + 
+             COLLECT(DISTINCT dept.Dept_Name) + 
+             COLLECT(DISTINCT parent_org.Org_Name) AS all_orgs
         
         RETURN a.Author_ID AS author_id, 
                a.Author_Name AS author_name, 
-               a.skills AS skills,
-               paper_count,
-               [org IN organizations WHERE org IS NOT NULL] AS organizations,
-               total_citations
+               COALESCE(a.skills, '') AS skills,
+               COALESCE(paper_count, 0) as paper_count,
+               [org_name IN all_orgs WHERE org_name IS NOT NULL AND org_name <> ''] AS organizations,
+               COALESCE(total_citations, 0) AS total_citations
         ORDER BY a.Author_Name
         """
         
@@ -935,20 +939,42 @@ class ScientificTeamFormation:
             enhanced_details = []
             
             for record in result:
+                skills_str = record['skills'] or ''
+                # Clean up skills string and make it more readable
+                if skills_str:
+                    # Remove extra quotes and clean up the skills
+                    skills_str = skills_str.replace('"', '').replace("'", "")
+                    # Split by common separators and clean
+                    if ',' in skills_str:
+                        skills_list = [s.strip() for s in skills_str.split(',') if s.strip()]
+                        skills_str = ', '.join(skills_list)
+                    elif ';' in skills_str:
+                        skills_list = [s.strip() for s in skills_str.split(';') if s.strip()]
+                        skills_str = ', '.join(skills_list)
+                
                 author_detail = {
                     'author_id': record['author_id'],
                     'author_name': record['author_name'],
-                    'skills': record['skills'] or '',
-                    'paper_count': record['paper_count'] or 0,
-                    'organizations': record['organizations'] or [],
-                    'total_citations': record['total_citations'] or 0
+                    'all_skills': skills_str if skills_str else 'No specific skills listed',
+                    'paper_count': record['paper_count'],
+                    'organizations': record['organizations'],
+                    'total_citations': record['total_citations']
                 }
                 enhanced_details.append(author_detail)
                 
+            logger.info(f"Retrieved enhanced details for {len(enhanced_details)} authors")
             return enhanced_details
         except Exception as e:
             logger.error(f"Error in get_enhanced_member_details: {e}")
-            return []
+            # Return basic structure even on error
+            return [{
+                'author_id': aid,
+                'author_name': f'Author {aid}',
+                'all_skills': 'Data unavailable',
+                'paper_count': 0,
+                'organizations': [],
+                'total_citations': 0
+            } for aid in author_ids]
 
     def find_matching_skills(self, skills_str: str, keywords: List[str]) -> List[str]:
         """Find skills from an author that match any of the required keywords."""
