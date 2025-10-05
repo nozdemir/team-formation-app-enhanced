@@ -635,41 +635,59 @@
             const incompleteTeams = totalTeams - completeTeams;
             const avgTeamSize = teams.reduce((sum, t) => sum + (t.members || []).length, 0) / totalTeams;
 
-            // Create formatted output with blue-themed summary
+            // Create formatted output with improved summary section
             let html = `
                 <div class="formatted-results">
-                    <!-- Summary Section with Blue Background -->
-                    <div class="card mb-4" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: none; color: white; box-shadow: 0 8px 25px rgba(0,0,0,0.15);">
-                        <div class="card-body text-center">
-                            <h2 class="mb-3"><i class="fas fa-users"></i> Team Formation Results</h2>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <h4 style="color: #87ceeb;">${totalTeams}</h4>
-                                    <small>Total Teams</small>
+                    <!-- Enhanced Summary Section -->
+                    <div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
+                                border-radius: 10px; 
+                                padding: 20px; 
+                                margin: 20px 0; 
+                                color: white; 
+                                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                                border: none;">
+                        <div style="text-align: center;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <div>
+                                    <span style="background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 15px; font-size: 14px;">
+                                        <i class="fas fa-chart-line"></i> Summary
+                                    </span>
                                 </div>
-                                <div class="col-md-3">
-                                    <h4 style="color: #90ee90;">${completeTeams}</h4>
-                                    <small>Complete Teams</small>
-                                </div>
-                                <div class="col-md-3">
-                                    <h4 style="color: #ffb6c1;">${incompleteTeams}</h4>
-                                    <small>Incomplete Teams</small>
-                                </div>
-                                <div class="col-md-3">
-                                    <h4 style="color: #ffffff;">${formationTime}s</h4>
-                                    <small>Formation Time</small>
+                                <div style="text-align: right;">
+                                    <strong style="font-size: 16px;">Algorithm:</strong> ${data.summary?.algorithm_name || data.algorithm}
                                 </div>
                             </div>
-                            <hr style="border-color: rgba(255,255,255,0.3);">
-                            <div class="row mt-3">
-                                <div class="col-md-4">
-                                    <strong>Algorithm:</strong> ${data.summary?.algorithm_name || data.algorithm}
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; text-align: center;">
+                                <div>
+                                    <div style="font-size: 24px; font-weight: bold; color: #87ceeb;">
+                                        ${Math.round((completeTeams/totalTeams)*100)}%
+                                    </div>
+                                    <div style="font-size: 12px; opacity: 0.9;">Success Rate</div>
                                 </div>
-                                <div class="col-md-4">
-                                    <strong>Success Rate:</strong> ${Math.round((completeTeams/totalTeams)*100)}%
+                                <div>
+                                    <div style="font-size: 24px; font-weight: bold; color: #90ee90;">
+                                        ${completeTeams}
+                                    </div>
+                                    <div style="font-size: 12px; opacity: 0.9;">Complete Teams</div>
                                 </div>
-                                <div class="col-md-4">
-                                    <strong>Avg Team Size:</strong> ${avgTeamSize.toFixed(1)}
+                                <div>
+                                    <div style="font-size: 24px; font-weight: bold; color: #ffb6c1;">
+                                        ${incompleteTeams}
+                                    </div>
+                                    <div style="font-size: 12px; opacity: 0.9;">Incomplete Teams</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px; font-weight: bold; color: #ffffff;">
+                                        ${avgTeamSize.toFixed(1)}
+                                    </div>
+                                    <div style="font-size: 12px; opacity: 0.9;">Average Team Size</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px; font-weight: bold; color: #ffd700;">
+                                        ${formationTime}s
+                                    </div>
+                                    <div style="font-size: 12px; opacity: 0.9;">Formation Time</div>
                                 </div>
                             </div>
                         </div>
@@ -677,11 +695,37 @@
             `;
 
             if (data.teams && data.teams.length > 0) {
-                data.teams.forEach(team => {
+                data.teams.forEach((team, index) => {
                     const members = team.members || [];
+                    const requiredSize = parseInt(document.getElementById('team_size')?.value || 5);
+                    const currentSize = members.length;
+                    const isComplete = (team.completeness || 1) >= 1.0;
+                    const completionStatus = isComplete ? 'Complete' : 'Incomplete';
+                    const statusColor = isComplete ? '#90ee90' : '#ffb6c1';
+                    const statusIcon = isComplete ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
+                    
+                    // Calculate missing keywords
+                    const allRequestedKeywords = (document.getElementById('keywords')?.value || '').split(',').map(k => k.trim()).filter(k => k);
+                    const coveredKeywords = team.skills_covered || [];
+                    const missingKeywords = allRequestedKeywords.filter(keyword => 
+                        !coveredKeywords.some(covered => covered.toLowerCase().includes(keyword.toLowerCase()))
+                    );
+                    
                     html += `
                     <div class="team">
-                        <h3>${team.team_name || `Team ${team.team_number}`}</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h3 style="margin: 0;">${team.team_name || `Team ${index + 1}`}</h3>
+                            <div style="text-align: right;">
+                                <span style="background: ${statusColor}; color: #333; padding: 5px 12px; border-radius: 20px; font-weight: bold; margin-left: 10px;">
+                                    <i class="${statusIcon}"></i> ${completionStatus}
+                                </span>
+                                <br>
+                                <small style="color: #666; margin-top: 5px; display: block;">
+                                    ${currentSize}/${requiredSize} members found
+                                </small>
+                            </div>
+                        </div>
+                        
                         <div class="member">
                             <strong>Members:</strong>
                             <ul style="padding-left: 20px;">`;
@@ -712,10 +756,21 @@
                         </div>
                         <div class="member">
                             <strong>Keywords Covered:</strong>
-                            <div>${team.skills_covered.map(skill => 
+                            <div>${coveredKeywords.map(skill => 
                                 `<span class="keyword-tag">${skill}</span>`
                             ).join(' ')}</div>
                         </div>`;
+                    
+                    // Show missing keywords if any
+                    if (missingKeywords.length > 0) {
+                        html += `
+                        <div class="member">
+                            <strong>Missing Keywords:</strong>
+                            <div>${missingKeywords.map(skill => 
+                                `<span class="keyword-tag" style="background-color: #ffb6c1; color: #333;">${skill}</span>`
+                            ).join(' ')}</div>
+                        </div>`;
+                    }
                         
                     if (team.requested_skills && team.requested_skills.length > 0) {
                         html += `
