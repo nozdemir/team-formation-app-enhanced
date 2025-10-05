@@ -1,6 +1,9 @@
 // This file contains the JavaScript code for the application, handling client-side interactions and dynamic content.
 
 function formTeams() {
+    // Record start time for performance tracking
+    window.teamFormationStartTime = Date.now();
+    
     const algorithm = document.getElementById('algorithm').value;
     const keywords = document.getElementById('keywords').value;
     const teamSize = document.getElementById('team_size').value || 5;
@@ -87,21 +90,49 @@ function displayResults(data) {
     const avgTeamSize = teams.reduce((sum, t) => sum + (t.members || []).length, 0) / totalTeams;
     const avgCompleteness = teams.reduce((sum, t) => sum + (t.completeness || 1), 0) / totalTeams * 100;
     
-    // Create formatted output like the original
+    // Record end time for performance calculation
+    const endTime = Date.now();
+    const formationTime = window.teamFormationStartTime ? ((endTime - window.teamFormationStartTime) / 1000).toFixed(2) : 'N/A';
+    
+    // Create formatted output with blue-themed summary
     let html = `
         <div class="formatted-results">
-            <h2>✅ Team Formation Results</h2>
-            <p><strong>Successfully formed ${totalTeams} teams</strong></p>
-            
-            <h4>📊 Summary</h4>
-            <p><strong>Keywords:</strong> ${summary.keywords_requested ? summary.keywords_requested.join(', ') : 'N/A'}</p>
-            <p><strong>Algorithm:</strong> ${summary.algorithm_name || 'Team Formation Algorithm'}</p>
-            <p><strong>Success Rate:</strong> ${completeTeams}/${totalTeams}</p>
-            <p><strong>Average Team Size:</strong> ${avgTeamSize.toFixed(1)}</p>
-            <p><strong>Average Completeness:</strong> ${avgCompleteness.toFixed(0)}%</p>
-            <p><strong>Complete Teams:</strong> ${completeTeams}</p>
-            <p><strong>Incomplete Teams:</strong> ${incompleteTeams}</p>
-            <br>
+            <!-- Summary Section with Blue Background -->
+            <div class="card mb-4" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); border: none; color: white;">
+                <div class="card-body text-center">
+                    <h2 class="mb-3"><i class="fas fa-users"></i> Team Formation Results</h2>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h4 class="text-warning">${totalTeams}</h4>
+                            <small>Total Teams</small>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-success">${completeTeams}</h4>
+                            <small>Complete Teams</small>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-light">${incompleteTeams}</h4>
+                            <small>Incomplete Teams</small>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-info">${formationTime}s</h4>
+                            <small>Formation Time</small>
+                        </div>
+                    </div>
+                    <hr class="bg-light">
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <strong>Algorithm:</strong> ${summary.algorithm_name || 'Team Formation Algorithm'}
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Success Rate:</strong> ${Math.round((completeTeams/totalTeams)*100)}%
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Avg Team Size:</strong> ${avgTeamSize.toFixed(1)}
+                        </div>
+                    </div>
+                </div>
+            </div>
     `;
     
         // Display each team in enhanced detailed format
@@ -291,36 +322,25 @@ function displayResults(data) {
         <div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #f0fff4 0%, #f8fff9 100%); border: 2px solid #28a745; border-radius: 10px;">
             <div class="text-center">
                 <h4 style="color: #28a745; margin-bottom: 15px;">
-                    <i class="fas fa-chart-line"></i> Help Us Improve - Evaluate This Team Formation
+                    <i class="fas fa-chart-line"></i> 
+                    <a href="#" onclick="showEmbeddedForm(); return false;" style="color: #28a745; text-decoration: none;">
+                        Help Us Improve - Evaluate This Team Formation
+                    </a>
                 </h4>
                 <p style="margin-bottom: 20px; color: #155724;">
-                    <strong>Your feedback is valuable for our scientific research.</strong><br>
-                    Please take 2-3 minutes to evaluate the team formation results.
+                    <strong>Your feedback is valuable for our scientific research.</strong>
                 </p>
                 
                 <div class="row justify-content-center">
                     <div class="col-md-8">
-                        <button onclick="openFeedbackForm()" class="btn btn-success btn-lg me-3" style="min-width: 180px;">
-                            <i class="fas fa-clipboard-list"></i> Provide Feedback
-                        </button>
-                        <button onclick="copyTeamResults()" class="btn btn-outline-primary">
+                        <button onclick="copyTeamResults()" class="btn btn-lg me-3" style="min-width: 180px; background-color: white; color: #333; border: 2px solid #ddd;">
                             <i class="fas fa-copy"></i> Copy Results
                         </button>
                     </div>
                 </div>
                 
-                <!-- Embedded form option -->
-                <div class="mt-3">
-                    <small class="text-muted">
-                        Prefer embedded form? 
-                        <a href="#" onclick="showEmbeddedForm(); return false;" style="color: #28a745;">
-                            Click here to open form below
-                        </a>
-                    </small>
-                </div>
-                
-                <!-- Embedded form container (initially hidden) -->
-                <div id="embeddedFormContainer" style="display: none; margin-top: 20px;">
+                <!-- Embedded form container (initially visible) -->
+                <div id="embeddedFormContainer" style="margin-top: 20px;">
                     <hr>
                     <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfjqhqiC3mDT3UU2R5oupe08Kr5ESuNTseKPQbEbwjPMumnRw/viewform?embedded=true" 
                             width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">
