@@ -307,16 +307,26 @@
                     <button type="submit" class="btn" id="submitBtn" style="flex: 1;">
                         Form Teams 🚀
                     </button>
-                    <button type="button" class="btn" id="stopBtn" style="background: #dc3545; display: none; flex: 0 0 auto; padding: 15px 20px;">
-                        ⚙️ Stop
-                    </button>
-                    <button type="button" class="btn" id="optimizeBtn" style="background: #28a745; flex: 0 0 auto; padding: 15px 20px;" onclick="optimizeDatabase()">
-                        ⚡ Optimize DB
+                    <button type="button" class="btn" id="stopBtn" style="background: #dc3545; display: none; flex: 0 0 auto; padding: 15px 20px;" onclick="stopCurrentTask()">
+                        🛑 Stop
                     </button>
                 </div>
             </form>
 
             <div id="status"></div>
+        </div>
+
+        <!-- Progress Container -->
+        <div id="progressContainer" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 15px; border-radius: 10px; margin: 20px 0; display: none;">
+            <div style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">
+                ⏱️ <span id="elapsedTimer">0</span> seconds
+            </div>
+            <div id="statusMessage" style="font-size: 14px; opacity: 0.9;">
+                Processing teams (async mode - no more timeouts!)
+            </div>
+            <div style="width: 100%; background-color: rgba(255,255,255,0.3); border-radius: 10px; height: 8px; margin-top: 10px; overflow: hidden;">
+                <div id="progressBar" style="width: 5%; background-color: #90ee90; height: 100%; border-radius: 10px; transition: width 0.3s ease;"></div>
+            </div>
         </div>
 
         <div id="results" class="results"></div>
@@ -511,36 +521,7 @@
             }
         });
 
-        // Database optimization function
-        async function optimizeDatabase() {
-            const optimizeBtn = document.getElementById('optimizeBtn');
-            const originalText = optimizeBtn.textContent;
-            
-            try {
-                optimizeBtn.disabled = true;
-                optimizeBtn.textContent = '⚡ Optimizing...';
-                showStatus('Creating database indexes for better performance...', 'info');
-                
-                const response = await fetch('/api/create-indexes', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showStatus(`✅ Database optimized! Created ${result.created_indexes.length} indexes. Performance should be MUCH faster now!`, 'success');
-                } else {
-                    showStatus(`❌ Optimization failed: ${result.error}`, 'error');
-                }
-                
-            } catch (error) {
-                showStatus(`❌ Optimization error: ${error.message}`, 'error');
-            } finally {
-                optimizeBtn.disabled = false;
-                optimizeBtn.textContent = originalText;
-            }
-        }
+
         
         // Stop task function
         async function stopCurrentTask() {
@@ -591,27 +572,24 @@
             }
             
             const submitBtn = document.getElementById('submitBtn');
+            const stopBtn = document.getElementById('stopBtn');
             const resultsDiv = document.getElementById('results');
+            const progressContainer = document.getElementById('progressContainer');
+            
+            // Show progress container and start timer
+            progressContainer.style.display = 'block';
+            startTimer();
             
             submitBtn.disabled = true;
-            submitBtn.textContent = '🔄 Starting...';
+            submitBtn.textContent = '🔄 Processing...';
+            stopBtn.style.display = 'inline-block';
             
             resultsDiv.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    <h3 style="color: #2a5298; margin-bottom: 15px;">🔄 Starting Async Team Formation...</h3>
+                    <h3 style="color: #2a5298; margin-bottom: 15px;">🔄 Async Team Formation in Progress...</h3>
                     <p style="font-size: 16px; margin-bottom: 10px;">Algorithm: <strong>${algorithm}</strong></p>
                     <p style="font-size: 14px; margin-bottom: 20px;">Keywords: <strong>${selectedKeywords.join(', ')}</strong></p>
-                    
-                    <div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 15px; border-radius: 10px; margin: 20px 0;">
-                        <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px;">
-                            ⏱️ <span id="elapsedTimer">0</span> seconds
-                        </div>
-                        <div style="font-size: 12px; opacity: 0.9;">
-                            Async processing - no timeout limits!
-                        </div>
-                        <div style="width: 100%; background-color: rgba(255,255,255,0.3); border-radius: 10px; height: 8px; margin-top: 10px;">
-                            <div id="progressBar" style="width: 5%; background-color: #90ee90; height: 100%; border-radius: 10px; transition: width 0.3s ease;"></div>
                         </div>
                     </div>
                     
@@ -699,14 +677,36 @@
                             progressEl.style.width = Math.min(status.progress, 95) + '%';
                         }
                         
+                        // Update timer with server elapsed time if available
+                        if (status.elapsed_seconds !== undefined) {
+                            elapsedSeconds = status.elapsed_seconds;
+                            const timerElement = document.getElementById('elapsedTimer');
+                            if (timerElement) {
+                                timerElement.textContent = elapsedSeconds;
+                            }
+                        }
+                        
+                        // Update status message if available
+                        if (status.message) {
+                            const statusMessage = document.getElementById('statusMessage');
+                            if (statusMessage) {
+                                statusMessage.textContent = status.message;
+                            }
+                        }
+                        
                         if (status.status === 'completed') {
                             clearInterval(pollInterval);
+                            if (window.currentTimerInterval) {
+                                clearInterval(window.currentTimerInterval);
+                            }
                             console.log('Task completed successfully');
                             
                             window.lastUsedKeywords = [...selectedKeywords];
                             displayResults(status.result);
                             showStatus('✅ Teams formed successfully!', 'success');
                             
+                            stopTimer();
+                            document.getElementById('progressContainer').style.display = 'none';
                             submitBtn.disabled = false;
                             submitBtn.textContent = 'Form Teams 🚀';
                             document.getElementById('stopBtn').style.display = 'none';
@@ -719,6 +719,8 @@
                             throw new Error(status.error || 'Processing failed');
                         } else if (status.status === 'stopped') {
                             clearInterval(pollInterval);
+                            stopTimer();
+                            document.getElementById('progressContainer').style.display = 'none';
                             document.getElementById('stopBtn').style.display = 'none';
                             window.currentTaskId = null;
                             showStatus('🛑 Task was stopped', 'info');
@@ -751,6 +753,9 @@
                     </div>
                 `;
                 
+                stopTimer();
+                document.getElementById('progressContainer').style.display = 'none';
+                document.getElementById('stopBtn').style.display = 'none';
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Form Teams 🚀';
             }
@@ -761,6 +766,31 @@
             e.preventDefault();
             formTeamsAsync();
         });
+
+        // Timer functions
+        let timerInterval = null;
+        
+        function startTimer() {
+            const timerElement = document.getElementById('elapsedTimer');
+            if (!timerElement) return;
+            
+            clearInterval(timerInterval); // Clear any existing timer
+            
+            const startTime = Date.now();
+            timerElement.textContent = '0';
+            
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                timerElement.textContent = elapsed;
+            }, 1000);
+        }
+        
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
 
         function showStatus(message, type = 'info') {
             const statusDiv = document.getElementById('status');
