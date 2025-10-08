@@ -911,6 +911,38 @@ class ScientificTeamFormation:
             logger.error(f"Error in get_member_details: {e}")
             return []
 
+    def get_keyword_specific_citations(self, tx, author_id: str, keyword: str) -> Dict:
+        """Get citations specifically for papers related to the given keyword."""
+        query = """
+        MATCH (a:Author)
+        WHERE a.Author_ID = $author_id
+        
+        // Get papers related to the specific keyword
+        OPTIONAL MATCH (a)-[:WRITTEN]->(p:Paper)
+        WHERE any(kw IN split(p.Combined_Keywords, ', ') WHERE toLower(kw) CONTAINS toLower($keyword))
+        OR (a.skills IS NOT NULL AND any(skill IN split(a.skills, ', ') WHERE toLower(skill) CONTAINS toLower($keyword)))
+        
+        WITH a, COLLECT(DISTINCT p) as related_papers
+        
+        RETURN a.Author_ID AS author_id,
+               SIZE(related_papers) as keyword_paper_count,
+               REDUCE(total = 0, paper IN related_papers | total + COALESCE(paper.n_Citation, 0)) AS keyword_citations
+        """
+        
+        try:
+            result = tx.run(query, author_id=author_id, keyword=keyword)
+            record = result.single()
+            if record:
+                return {
+                    'keyword_paper_count': record['keyword_paper_count'] or 0,
+                    'keyword_citations': record['keyword_citations'] or 0
+                }
+            else:
+                return {'keyword_paper_count': 0, 'keyword_citations': 0}
+        except Exception as e:
+            logger.error(f"Error getting keyword-specific citations for {author_id}, keyword {keyword}: {e}")
+            return {'keyword_paper_count': 0, 'keyword_citations': 0}
+
     def get_enhanced_member_details(self, tx, author_ids: List[str]) -> List[Dict]:
         """Get enhanced detailed information about specific authors including papers, organizations, and all skills."""
         query = """
@@ -1267,6 +1299,7 @@ class ScientificTeamFormation:
                         members = []
                         team_skills = set()
                         team_status = "complete"
+                        team_total_citations = 0
                         
 
                         
@@ -1287,6 +1320,20 @@ class ScientificTeamFormation:
                             
                             # Get enhanced details from database
                             enhanced_detail = details_map.get(author_id, {})
+                            total_citations = enhanced_detail.get('total_citations', 0)
+                            
+                            # Get keyword-specific citations if we have a specific skill they were added for
+                            keyword_citations = 0
+                            keyword_paper_count = 0
+                            if added_for_skill and added_for_skill != 'Team Member' and added_for_skill != 'nan':
+                                with self.driver.session() as session:
+                                    keyword_data = session.execute_read(self.get_keyword_specific_citations, author_id, added_for_skill)
+                                    keyword_citations = keyword_data.get('keyword_citations', 0)
+                                    keyword_paper_count = keyword_data.get('keyword_paper_count', 0)
+                            else:
+                                # If no specific keyword, use total citations
+                                keyword_citations = total_citations
+                                keyword_paper_count = enhanced_detail.get('paper_count', 0)
                             
                             members.append({
                                 "author_id": author_id,
@@ -1297,9 +1344,15 @@ class ScientificTeamFormation:
                                 "all_skills": enhanced_detail.get('skills', 'No skills data'),
                                 "skills": enhanced_detail.get('skills', 'No skills data'),
                                 "paper_count": enhanced_detail.get('paper_count', 0),
-                                "organizations": enhanced_detail.get('organizations', []),
-                                "total_citations": enhanced_detail.get('total_citations', 0)
+                                "keyword_paper_count": keyword_paper_count,
+                                "citation_count": keyword_citations,  # Use keyword-specific citations
+                                "total_citations": total_citations,  # Keep total for reference
+                                "keyword_citations": keyword_citations,  # Explicit field for keyword citations
+                                "organizations": enhanced_detail.get('organizations', [])
                             })
+                            
+                            # Add keyword-specific citations to team total
+                            team_total_citations += keyword_citations
                             
                             if matching_skills and matching_skills != 'nan':
                                 skills = [s.strip() for s in matching_skills.split(',') if s.strip()]
@@ -1308,15 +1361,23 @@ class ScientificTeamFormation:
                             if row.get('Status') == 'incomplete':
                                 team_status = "incomplete"
                         
+                        # Calculate completeness based on members found vs keywords required
+                        required_members = len(keywords)  # One member per keyword
+                        found_members = len(members)
+                        actual_completeness = min(found_members / required_members, 1.0) if required_members > 0 else 1.0
+                        
                         teams.append({
                             "team_number": len(teams) + 1,
                             "team_name": str(team_name),
                             "members": members,
                             "skills_covered": list(team_skills),
                             "requested_skills": keywords,
-                            "completeness": 1.0 if team_status == "complete" else 0.7,
+                            "completeness": actual_completeness,
                             "algorithm": algorithm,
-                            "status": team_status
+                            "status": team_status,
+                            "total_citations": team_total_citations,
+                            "found_members": found_members,
+                            "required_members": required_members
                         })
             
             statistics = self._calculate_team_statistics(teams, keywords)

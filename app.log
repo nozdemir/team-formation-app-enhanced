@@ -1,0 +1,1408 @@
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:__main__:Starting Flask app on port 5000 with debug=False
+INFO:__main__:Available routes:
+INFO:__main__:- / (Home page)
+INFO:__main__:- /test (Test endpoint)
+INFO:__main__:- /api/health (Health check)
+INFO:__main__:- /api/algorithms (Get algorithms)
+INFO:__main__:- /api/keywords (Get keywords)
+INFO:__main__:- /api/form-teams (Form teams - POST)
+INFO:__main__:- /api/test_connection (Test database)
+INFO:__main__:- /api/search-authors (Search authors)
+INFO:__main__:- /api/algorithm-info/<id> (Get algorithm details)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.17.24.36:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5002
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug:127.0.0.1 - - [07/Oct/2025 17:25:03] "GET / HTTP/1.1" 200 -
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:app.routes:Getting algorithms...
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [07/Oct/2025 17:25:04] "GET /api/keywords-file HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/Oct/2025 17:25:04] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:numexpr.utils:NumExpr defaulting to 12 threads.
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    team_formation = PerformanceOptimizedTeamFormation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [07/Oct/2025 17:25:05] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:werkzeug:127.0.0.1 - - [07/Oct/2025 17:25:20] "POST /api/form-teams-async HTTP/1.1" 200 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    team_formation = PerformanceOptimizedTeamFormation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+ERROR:app.routes:Async team formation error: Neo4j connection failed: Unable to retrieve routing information
+INFO:werkzeug:127.0.0.1 - - [07/Oct/2025 17:25:25] "GET /api/task-status/d675f354-7cd8-4609-b83b-ab8f4758ea06 HTTP/1.1" 200 -
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:__main__:Starting Flask app on port 5000 with debug=False
+INFO:__main__:Available routes:
+INFO:__main__:- / (Home page)
+INFO:__main__:- /test (Test endpoint)
+INFO:__main__:- /api/health (Health check)
+INFO:__main__:- /api/algorithms (Get algorithms)
+INFO:__main__:- /api/keywords (Get keywords)
+INFO:__main__:- /api/form-teams (Form teams - POST)
+INFO:__main__:- /api/test_connection (Test database)
+INFO:__main__:- /api/search-authors (Search authors)
+INFO:__main__:- /api/algorithm-info/<id> (Get algorithm details)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:__main__:Starting Flask app on port 5000 with debug=False
+INFO:__main__:Available routes:
+INFO:__main__:- / (Home page)
+INFO:__main__:- /test (Test endpoint)
+INFO:__main__:- /api/health (Health check)
+INFO:__main__:- /api/algorithms (Get algorithms)
+INFO:__main__:- /api/keywords (Get keywords)
+INFO:__main__:- /api/form-teams (Form teams - POST)
+INFO:__main__:- /api/test_connection (Test database)
+INFO:__main__:- /api/search-authors (Search authors)
+INFO:__main__:- /api/algorithm-info/<id> (Get algorithm details)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with watchdog (windowsapi)
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 607-398-106
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 00:46:19] "GET / HTTP/1.1" 200 -
+INFO:app.routes:Getting algorithms...
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 00:46:19] "GET /api/keywords-file HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in 'C:\\Users\\nuri.ozdemir\\Google Drive\\Tedrisat\\Gazi - Yönetim Biliþim Sistemleri\\11 2024-2025 Yaz\\Kodlar\\Aura_DB\\h_t_f\\flask-webapp - download_onleval_04_10_2025\\team-formation-app-clean-duplicate\\optimized_team_formation_7_algorithms.py', reloading
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 00:46:19] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug: * Restarting with watchdog (windowsapi)
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 607-398-106
+INFO:app.routes:Getting algorithms...
+INFO:numexpr.utils:NumExpr defaulting to 12 threads.
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+INFO:werkzeug: * Detected change in 'C:\\Users\\nuri.ozdemir\\AppData\\Local\\anaconda3\\Lib\\site-packages\\neo4j\\_sync\\work\\session.py', reloading
+INFO:werkzeug: * Detected change in 'C:\\Users\\nuri.ozdemir\\AppData\\Local\\anaconda3\\Lib\\site-packages\\neo4j\\_sync\\work\\workspace.py', reloading
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    team_formation = PerformanceOptimizedTeamFormation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 00:46:21] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in 'C:\\Users\\nuri.ozdemir\\AppData\\Local\\anaconda3\\Lib\\site-packages\\neo4j\\_sync\\io\\_pool.py', reloading
+INFO:werkzeug: * Restarting with watchdog (windowsapi)
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 607-398-106
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 00:46:55] "POST /api/form-teams-async HTTP/1.1" 200 -
+INFO:numexpr.utils:NumExpr defaulting to 12 threads.
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    team_formation = PerformanceOptimizedTeamFormation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+ERROR:app.routes:Async team formation error: Neo4j connection failed: Unable to retrieve routing information
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 00:47:00] "GET /api/task-status/2e503439-df94-4d9c-94e2-43ef52cda4d5 HTTP/1.1" 200 -
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:__main__:Starting Flask app on port 5000 with debug=False
+INFO:__main__:Available routes:
+INFO:__main__:- / (Home page)
+INFO:__main__:- /test (Test endpoint)
+INFO:__main__:- /api/health (Health check)
+INFO:__main__:- /api/algorithms (Get algorithms)
+INFO:__main__:- /api/keywords (Get keywords)
+INFO:__main__:- /api/form-teams (Form teams - POST)
+INFO:__main__:- /api/test_connection (Test database)
+INFO:__main__:- /api/search-authors (Search authors)
+INFO:__main__:- /api/algorithm-info/<id> (Get algorithm details)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 00:58:39] "GET /?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759874319844 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 00:58:39] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Getting algorithms...
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 00:58:39] "GET /api/keywords-file HTTP/1.1" 200 -
+INFO:numexpr.utils:NumExpr defaulting to 12 threads.
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    team_formation = PerformanceOptimizedTeamFormation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 00:58:40] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 00:58:52] "GET / HTTP/1.1" 200 -
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 00:58:52] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Getting algorithms...
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 00:58:52] "GET /api/keywords-file HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 00:58:52] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    team_formation = PerformanceOptimizedTeamFormation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 00:58:52] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:__main__:Starting Flask app on port 5000 with debug=False
+INFO:__main__:Available routes:
+INFO:__main__:- / (Home page)
+INFO:__main__:- /test (Test endpoint)
+INFO:__main__:- /api/health (Health check)
+INFO:__main__:- /api/algorithms (Get algorithms)
+INFO:__main__:- /api/keywords (Get keywords)
+INFO:__main__:- /api/form-teams (Form teams - POST)
+INFO:__main__:- /api/test_connection (Test database)
+INFO:__main__:- /api/search-authors (Search authors)
+INFO:__main__:- /api/algorithm-info/<id> (Get algorithm details)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:04:37] "GET /?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759874676994 HTTP/1.1" 200 -
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:app.routes:Getting algorithms...
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:04:37] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:04:37] "GET /api/keywords-file HTTP/1.1" 200 -
+INFO:numexpr.utils:NumExpr defaulting to 12 threads.
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    team_formation = PerformanceOptimizedTeamFormation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:04:38] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:__main__:Starting Flask app on port 5000 with debug=False
+INFO:__main__:Available routes:
+INFO:__main__:- / (Home page)
+INFO:__main__:- /test (Test endpoint)
+INFO:__main__:- /api/health (Health check)
+INFO:__main__:- /api/algorithms (Get algorithms)
+INFO:__main__:- /api/keywords (Get keywords)
+INFO:__main__:- /api/form-teams (Form teams - POST)
+INFO:__main__:- /api/test_connection (Test database)
+INFO:__main__:- /api/search-authors (Search authors)
+INFO:__main__:- /api/algorithm-info/<id> (Get algorithm details)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:__main__:Starting Flask app on port 5000 with debug=False
+INFO:__main__:Available routes:
+INFO:__main__:- / (Home page)
+INFO:__main__:- /test (Test endpoint)
+INFO:__main__:- /api/health (Health check)
+INFO:__main__:- /api/algorithms (Get algorithms)
+INFO:__main__:- /api/keywords (Get keywords)
+INFO:__main__:- /api/form-teams (Form teams - POST)
+INFO:__main__:- /api/test_connection (Test database)
+INFO:__main__:- /api/search-authors (Search authors)
+INFO:__main__:- /api/algorithm-info/<id> (Get algorithm details)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:__main__:Starting Flask app on port 5000 with debug=False
+INFO:__main__:Available routes:
+INFO:__main__:- / (Home page)
+INFO:__main__:- /test (Test endpoint)
+INFO:__main__:- /api/health (Health check)
+INFO:__main__:- /api/algorithms (Get algorithms)
+INFO:__main__:- /api/keywords (Get keywords)
+INFO:__main__:- /api/form-teams (Form teams - POST)
+INFO:__main__:- /api/test_connection (Test database)
+INFO:__main__:- /api/search-authors (Search authors)
+INFO:__main__:- /api/algorithm-info/<id> (Get algorithm details)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:__main__:Starting Flask app on port 5000 with debug=False
+INFO:__main__:Available routes:
+INFO:__main__:- / (Home page)
+INFO:__main__:- /test (Test endpoint)
+INFO:__main__:- /api/health (Health check)
+INFO:__main__:- /api/algorithms (Get algorithms)
+INFO:__main__:- /api/keywords (Get keywords)
+INFO:__main__:- /api/form-teams (Form teams - POST)
+INFO:__main__:- /api/test_connection (Test database)
+INFO:__main__:- /api/search-authors (Search authors)
+INFO:__main__:- /api/algorithm-info/<id> (Get algorithm details)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:__main__:Starting Flask app on port 5000 with debug=False
+INFO:__main__:Available routes:
+INFO:__main__:- / (Home page)
+INFO:__main__:- /test (Test endpoint)
+INFO:__main__:- /api/health (Health check)
+INFO:__main__:- /api/algorithms (Get algorithms)
+INFO:__main__:- /api/keywords (Get keywords)
+INFO:__main__:- /api/form-teams (Form teams - POST)
+INFO:__main__:- /api/test_connection (Test database)
+INFO:__main__:- /api/search-authors (Search authors)
+INFO:__main__:- /api/algorithm-info/<id> (Get algorithm details)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:__main__:Starting Flask app on port 5000 with debug=False
+INFO:__main__:Available routes:
+INFO:__main__:- / (Home page)
+INFO:__main__:- /test (Test endpoint)
+INFO:__main__:- /api/health (Health check)
+INFO:__main__:- /api/algorithms (Get algorithms)
+INFO:__main__:- /api/keywords (Get keywords)
+INFO:__main__:- /api/form-teams (Form teams - POST)
+INFO:__main__:- /api/test_connection (Test database)
+INFO:__main__:- /api/search-authors (Search authors)
+INFO:__main__:- /api/algorithm-info/<id> (Get algorithm details)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:34:52] "GET /?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759876492227 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:34:52] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Getting algorithms...
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:34:52] "GET /api/keywords-file HTTP/1.1" 200 -
+INFO:numexpr.utils:NumExpr defaulting to 12 threads.
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:34:53] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:35:47] "GET /?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759876547386 HTTP/1.1" 200 -
+INFO:app.routes:Getting algorithms...
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:35:47] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:35:47] "GET /api/keywords-file HTTP/1.1" 200 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:35:47] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:35:49] "GET /?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759876549666 HTTP/1.1" 200 -
+INFO:app.routes:Getting algorithms...
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:35:49] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:35:49] "GET /api/keywords-file HTTP/1.1" 200 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:35:50] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:35:56] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:35:56] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Getting algorithms...
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:35:56] "GET /api/keywords-file HTTP/1.1" 200 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:35:57] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:37:27] "GET /?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759876647359 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:37:27] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Getting algorithms...
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:37:27] "GET /api/keywords-file HTTP/1.1" 200 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:37:27] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:__main__:Starting Flask app on port 5000 with debug=False
+INFO:__main__:Available routes:
+INFO:__main__:- / (Home page)
+INFO:__main__:- /test (Test endpoint)
+INFO:__main__:- /api/health (Health check)
+INFO:__main__:- /api/algorithms (Get algorithms)
+INFO:__main__:- /api/keywords (Get keywords)
+INFO:__main__:- /api/form-teams (Form teams - POST)
+INFO:__main__:- /api/test_connection (Test database)
+INFO:__main__:- /api/search-authors (Search authors)
+INFO:__main__:- /api/algorithm-info/<id> (Get algorithm details)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:40:35] "GET /?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759876835918 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:40:35] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:app.routes:Getting algorithms...
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:40:35] "GET /api/keywords-file HTTP/1.1" 200 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:40:36] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:44:30] "GET / HTTP/1.1" 200 -
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:app.routes:Getting algorithms...
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:44:30] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:44:30] "GET /api/keywords-file HTTP/1.1" 200 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:44:30] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:__main__:Starting Flask app on port 5000 with debug=False
+INFO:__main__:Available routes:
+INFO:__main__:- / (Home page)
+INFO:__main__:- /test (Test endpoint)
+INFO:__main__:- /api/health (Health check)
+INFO:__main__:- /api/algorithms (Get algorithms)
+INFO:__main__:- /api/keywords (Get keywords)
+INFO:__main__:- /api/form-teams (Form teams - POST)
+INFO:__main__:- /api/test_connection (Test database)
+INFO:__main__:- /api/search-authors (Search authors)
+INFO:__main__:- /api/algorithm-info/<id> (Get algorithm details)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with watchdog (windowsapi)
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 607-398-106
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:47:32] "GET /?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759877252061 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:47:32] "GET /api/databases HTTP/1.1" 200 -
+INFO:app.routes:Getting algorithms...
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - YÃ¶netim BiliÅŸim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:47:32] "GET /api/keywords-file HTTP/1.1" 200 -
+INFO:numexpr.utils:NumExpr defaulting to 12 threads.
+INFO:app.team_formation:Connecting to Neo4j at: neo4j+s://cc773764.databases.neo4j.io
+INFO:app.team_formation:Successfully connected to Neo4j cloud database with extended timeouts
+INFO:app.team_formation:ScientificTeamFormation initialized with Neo4j database
+INFO:app.routes:Team formation instance created for Small (Gazi) Network
+INFO:app.routes:Successfully loaded 7 algorithms from team formation class
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:47:35] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:51:52] "GET / HTTP/1.1" 200 -
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:app.routes:Getting algorithms...
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:51:52] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:51:52] "GET /api/keywords-file HTTP/1.1" 200 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:51:53] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:__main__:Starting Flask app on port 5000 with debug=False
+INFO:__main__:Available routes:
+INFO:__main__:- / (Home page)
+INFO:__main__:- /test (Test endpoint)
+INFO:__main__:- /api/health (Health check)
+INFO:__main__:- /api/algorithms (Get algorithms)
+INFO:__main__:- /api/keywords (Get keywords)
+INFO:__main__:- /api/form-teams (Form teams - POST)
+INFO:__main__:- /api/test_connection (Test database)
+INFO:__main__:- /api/search-authors (Search authors)
+INFO:__main__:- /api/algorithm-info/<id> (Get algorithm details)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:52:51] "GET / HTTP/1.1" 200 -
+INFO:app.routes:Getting algorithms...
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:52:51] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:52:51] "GET /api/keywords-file HTTP/1.1" 200 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:52:52] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:53:00] "[33mGET /api/databases?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759877580357 HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:53:03] "GET /?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759877583896 HTTP/1.1" 200 -
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:app.routes:Getting algorithms...
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:53:03] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:53:03] "GET /api/keywords-file HTTP/1.1" 200 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:53:04] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:54:19] "[33mGET /test_db_frontend.html HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:54:19] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:54:22] "[33mGET /test_db_frontend.html?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759877662760 HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:55:03] "GET /test?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759877703504 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:55:07] "[33mGET /api/databases?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759877707170 HTTP/1.1[0m" 404 -
+INFO:app:Neo4j URI: neo4j+s://54f41429.databases.neo4j.io
+INFO:app:Neo4j User: neo4j
+INFO:app:Flask app created successfully with blueprints registered
+INFO:__main__:Starting Flask app on port 5000 with debug=False
+INFO:__main__:Available routes:
+INFO:__main__:- / (Home page)
+INFO:__main__:- /test (Test endpoint)
+INFO:__main__:- /api/health (Health check)
+INFO:__main__:- /api/algorithms (Get algorithms)
+INFO:__main__:- /api/keywords (Get keywords)
+INFO:__main__:- /api/form-teams (Form teams - POST)
+INFO:__main__:- /api/test_connection (Test database)
+INFO:__main__:- /api/search-authors (Search authors)
+INFO:__main__:- /api/algorithm-info/<id> (Get algorithm details)
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:56:11] "GET /?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759877771748 HTTP/1.1" 200 -
+INFO:app.routes:Getting algorithms...
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:56:11] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:56:11] "GET /api/keywords-file HTTP/1.1" 200 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:56:12] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:56:43] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:56:43] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Getting algorithms...
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:56:43] "GET /api/keywords-file HTTP/1.1" 200 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:56:43] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:57:25] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:57:43] "GET / HTTP/1.1" 200 -
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:57:43] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Getting algorithms...
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:57:43] "GET /api/keywords-file HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:57:43] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:57:43] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:57:54] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:57:55] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Getting algorithms...
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:57:55] "GET /api/keywords-file HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:57:55] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 01:57:55] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 02:23:41] "GET /?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759879421763 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 02:23:41] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Getting algorithms...
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 02:23:41] "GET /api/keywords-file HTTP/1.1" 200 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 02:23:42] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 02:23:49] "GET /?id=4e2136c3-370b-46ea-b65b-c6df974f574c&vscodeBrowserReqId=1759879429506 HTTP/1.1" 200 -
+INFO:app.routes:Getting algorithms...
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 02:23:49] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 02:23:49] "GET /api/keywords-file HTTP/1.1" 200 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 02:23:49] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 14:51:44] "GET / HTTP/1.1" 200 -
+INFO:app.routes:Getting algorithms...
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 14:51:44] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 14:51:44] "GET /api/keywords-file HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 14:51:44] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 14:51:44] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 23:20:42] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 23:20:42] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:app.routes:Getting algorithms...
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 23:20:42] "GET /api/keywords-file HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 23:20:43] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+    result = session.run("RETURN 1 as test", timeout=self.QUERY_TIMEOUT)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+    'description': 'Complete industrial engineering research database with extensive data',
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+    self.connect_to_neo4j()
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+    raise Exception(f"Neo4j connection failed: {str(e)}")
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [08/Oct/2025 23:20:43] "GET /api/algorithms HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Oct/2025 01:19:41] "GET / HTTP/1.1" 200 -
+INFO:app.routes:Loading keywords from gazi_keywords.txt...
+INFO:app.routes:Getting algorithms...
+INFO:optimized_team_formation_7_algorithms:Optimized Neo4j connection closed
+INFO:app.routes:Found keywords file at: C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\data\gazi_keywords.txt
+INFO:optimized_team_formation_7_algorithms:Connecting to Neo4j at: neo4j+s://54f41429.databases.neo4j.io
+INFO:werkzeug:127.0.0.1 - - [09/Oct/2025 01:19:42] "[33mGET /api/databases HTTP/1.1[0m" 404 -
+INFO:app.routes:Successfully loaded 649 keywords for auto-complete
+INFO:werkzeug:127.0.0.1 - - [09/Oct/2025 01:19:42] "GET /api/keywords-file HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Oct/2025 01:19:42] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+ERROR:neo4j:Unable to retrieve routing information
+ERROR:optimized_team_formation_7_algorithms:Failed to connect to Neo4j: Unable to retrieve routing information
+ERROR:app.routes:Failed to create team formation instance: Neo4j connection failed: Unable to retrieve routing information
+ERROR:app.routes:Traceback: Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 131, in connect_to_neo4j
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 301, in run
+    self._connect(self._config.default_access_mode)
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\session.py", line 131, in _connect
+    super()._connect(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\work\workspace.py", line 161, in _connect
+    self._pool.update_routing_table(
+  File "C:\Users\nuri.ozdemir\AppData\Local\anaconda3\Lib\site-packages\neo4j\_sync\io\_pool.py", line 804, in update_routing_table
+    raise ServiceUnavailable("Unable to retrieve routing information")
+neo4j.exceptions.ServiceUnavailable: Unable to retrieve routing information
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\app\routes.py", line 23, in get_team_formation
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 102, in __init__
+  File "C:\Users\nuri.ozdemir\Google Drive\Tedrisat\Gazi - Yönetim Biliþim Sistemleri\11 2024-2025 Yaz\Kodlar\Aura_DB\h_t_f\flask-webapp - download_onleval_04_10_2025\team-formation-app-clean-duplicate\optimized_team_formation_7_algorithms.py", line 140, in connect_to_neo4j
+Exception: Neo4j connection failed: Unable to retrieve routing information
+
+WARNING:app.routes:Team formation error, using fallback algorithms: Neo4j connection failed: Unable to retrieve routing information
+INFO:app.routes:Returning 7 fallback algorithms
+INFO:werkzeug:127.0.0.1 - - [09/Oct/2025 01:19:42] "GET /api/algorithms HTTP/1.1" 200 -
