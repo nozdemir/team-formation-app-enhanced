@@ -1322,18 +1322,22 @@ class ScientificTeamFormation:
                             enhanced_detail = details_map.get(author_id, {})
                             total_citations = enhanced_detail.get('total_citations', 0)
                             
-                            # Get keyword-specific citations if we have a specific skill they were added for
-                            keyword_citations = 0
-                            keyword_paper_count = 0
-                            if added_for_skill and added_for_skill != 'Team Member' and added_for_skill != 'nan':
-                                with self.driver.session() as session:
-                                    keyword_data = session.execute_read(self.get_keyword_specific_citations, author_id, added_for_skill)
-                                    keyword_citations = keyword_data.get('keyword_citations', 0)
-                                    keyword_paper_count = keyword_data.get('keyword_paper_count', 0)
-                            else:
-                                # If no specific keyword, use total citations
-                                keyword_citations = total_citations
-                                keyword_paper_count = enhanced_detail.get('paper_count', 0)
+                            # For now, use total citations to avoid timeout issues on Heroku
+                            # TODO: Optimize keyword-specific citation queries for better performance
+                            keyword_citations = total_citations
+                            keyword_paper_count = enhanced_detail.get('paper_count', 0)
+                            
+                            # Optional: Enable keyword-specific citations for local development
+                            # if added_for_skill and added_for_skill != 'Team Member' and added_for_skill != 'nan':
+                            #     try:
+                            #         with self.driver.session() as session:
+                            #             keyword_data = session.execute_read(self.get_keyword_specific_citations, author_id, added_for_skill)
+                            #             keyword_citations = keyword_data.get('keyword_citations', 0)
+                            #             keyword_paper_count = keyword_data.get('keyword_paper_count', 0)
+                            #     except Exception as e:
+                            #         logger.warning(f"Keyword-specific citation query failed, using total citations: {e}")
+                            #         keyword_citations = total_citations
+                            #         keyword_paper_count = enhanced_detail.get('paper_count', 0)
                             
                             members.append({
                                 "author_id": author_id,

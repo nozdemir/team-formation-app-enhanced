@@ -1419,10 +1419,8 @@
                     const citationCount = keywordCitations; // Use keyword-specific citations
                     const totalCitations = member.total_citations || 0;
                     
-                    // Create tooltip text for citations
-                    const citationTooltip = addedFor && addedFor !== 'Team Member' && addedFor !== 'nan' 
-                        ? `Citations from papers related to "${addedFor}": ${keywordCitations} (from ${keywordPaperCount} papers). Total citations: ${totalCitations}`
-                        : `Total citations from all papers: ${totalCitations}`;
+                    // Create tooltip text for citations (currently showing total citations for performance)
+                    const citationTooltip = `Total citations from all papers: ${totalCitations}. Added for skill: ${addedFor}`;
                     
                     // Process skills
                     const skillsArray = memberSkills.split(',').map(skill => skill.trim()).filter(skill => skill);
