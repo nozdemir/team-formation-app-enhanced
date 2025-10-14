@@ -19,8 +19,17 @@ app = Flask(__name__, template_folder='app/templates', static_folder='app/static
 # Database configurations
 DATABASE_CONFIGS = {
     'gazi_db': {
-        'name': 'Scientific Research Network',
-        'description': 'Complete scientific research database',
+        'name': 'Small (Gazi) Network',
+        'description': 'Gazi University research network for faster testing',
+        'uri': os.environ.get('NEO4J_URI', 'neo4j+s://54f41429.databases.neo4j.io'),
+        'user': os.environ.get('NEO4J_USER', 'neo4j'),
+        'password': os.environ.get('NEO4J_PASSWORD', 'j1fv7zahO1N8ly6efLg0xUfDBQxwTGrQhEuZZn_gPkM'),
+        'size': 'small',
+        'expected_time': '10-30 seconds'
+    },
+    'industrial_db': {
+        'name': 'Full (Industrial Engineering) Network',
+        'description': 'Complete industrial engineering research database with extensive data',
         'uri': os.environ.get('NEO4J_URI', 'neo4j+s://54f41429.databases.neo4j.io'),
         'user': os.environ.get('NEO4J_USER', 'neo4j'),
         'password': os.environ.get('NEO4J_PASSWORD', 'j1fv7zahO1N8ly6efLg0xUfDBQxwTGrQhEuZZn_gPkM'),
@@ -270,9 +279,13 @@ def form_teams_async():
         config = DATABASE_CONFIGS[selected_database]
         print(f"🔗 Connecting to {config['name']}...")
         
-        # Use environment variables from app.yaml (no override needed)
-        print(f"🔍 Using NEO4J_URI: {os.environ.get('NEO4J_URI')}")
-        print(f"👤 Using NEO4J_USER: {os.environ.get('NEO4J_USER')}")
+        # Set environment variables for the selected database (both use same Neo4j but different network views)
+        os.environ['NEO4J_URI'] = config['uri']
+        os.environ['NEO4J_USER'] = config['user']
+        os.environ['NEO4J_PASSWORD'] = config['password']
+        
+        print(f"� Using NEO4J_URI: {config['uri']}")
+        print(f"👤 Using NEO4J_USER: {config['user']}")
         
         # Initialize team formation system with retry
         retry_count = 0
