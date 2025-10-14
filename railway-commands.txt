@@ -1,0 +1,21 @@
+# Railway Deployment Commands
+# Run these after upgrading to Hobby plan
+
+# 1. Deploy the application
+railway up
+
+# 2. Set environment variables
+railway variables --set "NEO4J_URI=neo4j+s://1ffc59ce.databases.neo4j.io:7687"
+railway variables --set "NEO4J_USERNAME=neo4j"
+railway variables --set "NEO4J_PASSWORD=your_neo4j_password"
+railway variables --set "FLASK_APP=wsgi.py"
+railway variables --set "FLASK_ENV=production"
+
+# 3. Generate domain
+railway domain
+
+# 4. Check deployment status
+railway status
+
+# 5. View logs
+railway logs

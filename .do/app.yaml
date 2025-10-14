@@ -1,0 +1,29 @@
+name: team-formation-app-enhanced
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: your-username/team-formation-app-enhanced
+    branch: main
+  run_command: gunicorn --worker-class gevent --workers 1 --bind 0.0.0.0:$PORT --timeout 0 wsgi:app
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 8080
+  envs:
+  - key: FLASK_APP
+    value: run.py
+  - key: FLASK_ENV
+    value: production
+  - key: NEO4J_URI_GAZI
+    value: bolt://hobby-pjmhaepgnbkdgbkenmpnlbal.dbs.graphenedb.com:24787
+  - key: NEO4J_USERNAME_GAZI
+    value: app217946871-u5HrXF
+  - key: NEO4J_PASSWORD_GAZI
+    value: b4gGm2aHGQIrcZZ5Pk6uE3PkT6zlm3
+  - key: NEO4J_URI_INDUSTRIAL
+    value: bolt://hobby-plomdhhdknalgbkenmpnlbal.dbs.graphenedb.com:24787
+  - key: NEO4J_USERNAME_INDUSTRIAL
+    value: app217946871-F9H2LI
+  - key: NEO4J_PASSWORD_INDUSTRIAL
+    value: b4gGm2aHGQIrcZZ5Pk6uE3PkT6zlm3

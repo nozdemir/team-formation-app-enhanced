@@ -1,0 +1,14 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 300
+restartPolicyType = "always"
+
+[[services]]
+name = "web"
+source = "."
+
+[services.web]
+startCommand = "gunicorn wsgi:app --bind 0.0.0.0:$PORT --timeout 0 --keep-alive 10 --max-requests 500 --max-requests-jitter 50 --worker-connections 1000"
