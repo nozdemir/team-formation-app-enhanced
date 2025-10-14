@@ -103,6 +103,11 @@ class ScientificTeamFormation:
             neo4j_user = os.getenv('NEO4J_USER', 'neo4j')
             neo4j_password = os.getenv('NEO4J_PASSWORD')
             
+            # Debug logging
+            logger.info(f"DEBUG: NEO4J_URI from env: {neo4j_uri}")
+            logger.info(f"DEBUG: NEO4J_USER from env: {neo4j_user}")
+            logger.info(f"DEBUG: NEO4J_PASSWORD exists: {bool(neo4j_password)}")
+            
             if not neo4j_uri or not neo4j_password:
                 logger.error("Neo4j connection details not found in environment variables")
                 raise Exception("Neo4j connection details missing")
