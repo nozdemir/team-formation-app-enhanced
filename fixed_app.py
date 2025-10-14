@@ -270,10 +270,9 @@ def form_teams_async():
         config = DATABASE_CONFIGS[selected_database]
         print(f"🔗 Connecting to {config['name']}...")
         
-        # Set environment variables with retry configuration
-        os.environ['NEO4J_URI'] = config['uri']
-        os.environ['NEO4J_USER'] = config['user']
-        os.environ['NEO4J_PASSWORD'] = config['password']
+        # Use environment variables from app.yaml (no override needed)
+        print(f"🔍 Using NEO4J_URI: {os.environ.get('NEO4J_URI')}")
+        print(f"👤 Using NEO4J_USER: {os.environ.get('NEO4J_USER')}")
         
         # Initialize team formation system with retry
         retry_count = 0
