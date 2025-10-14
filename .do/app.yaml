@@ -3,10 +3,9 @@ services:
 - name: web
   source_dir: /
   github:
-    repo: your-username/team-formation-app-enhanced
+    repo: nozdemir/team-formation-app-enhanced
     branch: main
-  run_command: gunicorn --worker-class gevent --workers 1 --bind 0.0.0.0:$PORT --timeout 0 wsgi:app
-  environment_slug: python
+  dockerfile_path: Dockerfile
   instance_count: 1
   instance_size_slug: basic-xxs
   http_port: 8080
