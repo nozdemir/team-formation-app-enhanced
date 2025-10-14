@@ -19,20 +19,11 @@ app = Flask(__name__, template_folder='app/templates', static_folder='app/static
 # Database configurations
 DATABASE_CONFIGS = {
     'gazi_db': {
-        'name': 'Small (Gazi) Network',
-        'description': 'Gazi University research network for faster testing',
-        'uri': os.environ.get('NEO4J_URI_GAZI', 'bolt://hobby-pjmhaepgnbkdgbkenmpnlbal.dbs.graphenedb.com:24787'),
-        'user': os.environ.get('NEO4J_USERNAME_GAZI', 'app217946871-u5HrXF'),
-        'password': os.environ.get('NEO4J_PASSWORD_GAZI', 'b4gGm2aHGQIrcZZ5Pk6uE3PkT6zlm3'),
-        'size': 'small',
-        'expected_time': '10-30 seconds'
-    },
-    'industrial_db': {
-        'name': 'Full (Industrial Engineering) Network',
-        'description': 'Complete industrial engineering research database with extensive data',
-        'uri': os.environ.get('NEO4J_URI_INDUSTRIAL', 'bolt://hobby-plomdhhdknalgbkenmpnlbal.dbs.graphenedb.com:24787'),
-        'user': os.environ.get('NEO4J_USERNAME_INDUSTRIAL', 'app217946871-F9H2LI'),
-        'password': os.environ.get('NEO4J_PASSWORD_INDUSTRIAL', 'b4gGm2aHGQIrcZZ5Pk6uE3PkT6zlm3'),
+        'name': 'Scientific Research Network',
+        'description': 'Complete scientific research database',
+        'uri': os.environ.get('NEO4J_URI', 'neo4j+s://54f41429.databases.neo4j.io'),
+        'user': os.environ.get('NEO4J_USER', 'neo4j'),
+        'password': os.environ.get('NEO4J_PASSWORD', 'j1fv7zahO1N8ly6efLg0xUfDBQxwTGrQhEuZZn_gPkM'),
         'size': 'large',
         'expected_time': '30-120 seconds'
     }

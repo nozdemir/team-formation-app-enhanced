@@ -4,7 +4,7 @@ services:
   source_dir: /
   github:
     repo: nozdemir/team-formation-app-enhanced
-    branch: main
+    branch: master
   dockerfile_path: Dockerfile
   instance_count: 1
   instance_size_slug: basic-xxs
@@ -14,15 +14,9 @@ services:
     value: run.py
   - key: FLASK_ENV
     value: production
-  - key: NEO4J_URI_GAZI
-    value: bolt://hobby-pjmhaepgnbkdgbkenmpnlbal.dbs.graphenedb.com:24787
-  - key: NEO4J_USERNAME_GAZI
-    value: app217946871-u5HrXF
-  - key: NEO4J_PASSWORD_GAZI
-    value: b4gGm2aHGQIrcZZ5Pk6uE3PkT6zlm3
-  - key: NEO4J_URI_INDUSTRIAL
-    value: bolt://hobby-plomdhhdknalgbkenmpnlbal.dbs.graphenedb.com:24787
-  - key: NEO4J_USERNAME_INDUSTRIAL
-    value: app217946871-F9H2LI
-  - key: NEO4J_PASSWORD_INDUSTRIAL
-    value: b4gGm2aHGQIrcZZ5Pk6uE3PkT6zlm3
+  - key: NEO4J_URI
+    value: neo4j+s://54f41429.databases.neo4j.io
+  - key: NEO4J_USER
+    value: neo4j
+  - key: NEO4J_PASSWORD
+    value: j1fv7zahO1N8ly6efLg0xUfDBQxwTGrQhEuZZn_gPkM
