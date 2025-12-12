@@ -21,18 +21,18 @@ DATABASE_CONFIGS = {
     'gazi_db': {
         'name': 'Small (Gazi) Network',
         'description': 'Gazi University research network for faster testing',
-        'uri': os.environ.get('NEO4J_URI', 'neo4j+s://54f41429.databases.neo4j.io'),
-        'user': os.environ.get('NEO4J_USER', 'neo4j'),
-        'password': os.environ.get('NEO4J_PASSWORD', 'j1fv7zahO1N8ly6efLg0xUfDBQxwTGrQhEuZZn_gPkM'),
+        'uri': 'neo4j+s://cc773764.databases.neo4j.io',
+        'user': 'neo4j',
+        'password': 'z2rSb4ew9gxVlqlrFk8l_VZQcVhIzBwgnlder4nKv1A',
         'size': 'small',
         'expected_time': '10-30 seconds'
     },
     'industrial_db': {
         'name': 'Full (Industrial Engineering) Network',
         'description': 'Complete industrial engineering research database with extensive data',
-        'uri': os.environ.get('NEO4J_URI', 'neo4j+s://54f41429.databases.neo4j.io'),
-        'user': os.environ.get('NEO4J_USER', 'neo4j'),
-        'password': os.environ.get('NEO4J_PASSWORD', 'j1fv7zahO1N8ly6efLg0xUfDBQxwTGrQhEuZZn_gPkM'),
+        'uri': 'neo4j+s://54f41429.databases.neo4j.io',
+        'user': 'neo4j',
+        'password': 'j1fv7zahO1N8ly6efLg0xUfDBQxwTGrQhEuZZn_gPkM',
         'size': 'large',
         'expected_time': '30-120 seconds'
     }
@@ -44,6 +44,11 @@ current_database = 'gazi_db'
 def index():
     """Home page"""
     return render_template('index.html')
+
+@app.route('/about')
+def about():
+    """About page"""
+    return render_template('about.html')
 
 @app.route('/api/databases', methods=['GET'])
 def get_databases():
@@ -99,17 +104,21 @@ def get_algorithms():
         },
         {
             "id": "TAT",
-            "name": "Team Affiliation Team Formation",
-            "description": "Forms teams based on organizational affiliation patterns"
+            "name": "Time-Aware Team Formation",
+            "description": "Considers recency of collaborations in team formation"
         },
         {
             "id": "CIT",
-            "name": "Citation-Impact Team Formation", 
-            "description": "Considers citation impact and research influence in team formation"
+            "name": "Citation-Optimized Team Formation", 
+            "description": "Optimizes team formation based on citation impact and collaboration strength"
         }
     ]
     
-    return jsonify(algorithms)
+    response = jsonify(algorithms)
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 @app.route('/api/keywords', methods=['GET'])
 def get_keywords():
@@ -263,29 +272,21 @@ def form_teams_async():
         algorithm = data.get('algorithm')
         keywords = data.get('keywords', [])
         num_teams = data.get('num_teams', 5)
-        selected_database = data.get('database', current_database)
-        
-        # Validate database selection
-        if selected_database not in DATABASE_CONFIGS:
-            raise Exception(f"Invalid database selection: {selected_database}")
         
         print(f"🚀 Starting team formation...")
-        print(f"📊 Database: {DATABASE_CONFIGS[selected_database]['name']}")
+        print(f"📊 Database: {DATABASE_CONFIGS[current_database]['name']}")
         print(f"🧮 Algorithm: {algorithm}")
         print(f"🔍 Keywords: {keywords}")
         print(f"👥 Number of teams: {num_teams}")
         
         # Get database configuration
-        config = DATABASE_CONFIGS[selected_database]
+        config = DATABASE_CONFIGS[current_database]
         print(f"🔗 Connecting to {config['name']}...")
         
-        # Set environment variables for the selected database (both use same Neo4j but different network views)
+        # Set environment variables with retry configuration
         os.environ['NEO4J_URI'] = config['uri']
         os.environ['NEO4J_USER'] = config['user']
         os.environ['NEO4J_PASSWORD'] = config['password']
-        
-        print(f"� Using NEO4J_URI: {config['uri']}")
-        print(f"👤 Using NEO4J_USER: {config['user']}")
         
         # Initialize team formation system with retry
         retry_count = 0
@@ -310,18 +311,13 @@ def form_teams_async():
             raise Exception("Failed to establish database connection after multiple attempts")
         
         print(f"⚙️ Running {algorithm} algorithm...")
-        teams_result = tf.form_teams(
+        teams = tf.form_teams(
             algorithm=algorithm,
             keywords=keywords,
             num_teams=num_teams
         )
         
-        # Extract teams array from the result dictionary
-        teams = teams_result.get('teams', []) if isinstance(teams_result, dict) else teams_result
-        
         print(f"✅ Successfully formed {len(teams)} teams")
-        print(f"🔍 Debug - teams_result type: {type(teams_result)}")
-        print(f"🔍 Debug - teams type: {type(teams)}")
         
         # Build the result data
         result_data = {
@@ -330,8 +326,7 @@ def form_teams_async():
             'algorithm': algorithm,
             'database': config['name'],
             'total_teams': len(teams),
-            'keywords_used': keywords,
-            'message': teams_result.get('message', 'Teams formed successfully') if isinstance(teams_result, dict) else 'Teams formed successfully'
+            'keywords_used': keywords
         }
         
         # Return for async compatibility
