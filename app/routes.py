@@ -79,7 +79,13 @@ def get_algorithms():
                 })
             
             logger.info(f"Successfully loaded {len(algorithm_list)} algorithms from team formation class")
-            return jsonify(algorithm_list)
+            logger.info(f"Algorithm names: {[a['name'] for a in algorithm_list]}")
+            
+            response = jsonify(algorithm_list)
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            return response
             
         except Exception as db_error:
             logger.warning(f"Team formation error, using fallback algorithms: {db_error}")
@@ -95,7 +101,13 @@ def get_algorithms():
             {"id": "CIT", "name": "Citation-Optimized Team Formation", "description": "Optimizes based on citation impact"}
         ]
         logger.info(f"Returning {len(fallback_algorithms)} fallback algorithms")
-        return jsonify(fallback_algorithms)
+        logger.info(f"Fallback algorithm names: {[a['name'] for a in fallback_algorithms]}")
+        
+        response = jsonify(fallback_algorithms)
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
         
     except Exception as e:
         logger.error(f"Error in get_algorithms: {e}")
