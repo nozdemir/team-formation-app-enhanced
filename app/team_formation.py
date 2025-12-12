@@ -651,9 +651,20 @@ class ScientificTeamFormation:
     def find_member_near_team_citation_optimized(self, tx, team_ids: List[str], keyword: str, max_distance: int, 
                                                excluded_ids: List[str] = None, time_threshold: int = 5, 
                                                null_years_option: int = 1, sort_order: str = "citation_first", **kwargs) -> Optional[Dict]:
-        """Find team members prioritizing citation impact and recent collaborations."""
+        """Find team members prioritizing citation impact and recent collaborations (CIT).
+
+        Implements the three-stage logic from TeamBuilder.find_member_near_team_citation_optimized:
+        1) Direct co-authorships on recent keyword papers.
+        2) Direct co-working (WORKS_IN|INCLUDES at org_distance=2) with recent keyword papers.
+        3) Any-path shortestPath fallback within max_distance.
+
+        Adapted to this app's string-based schema (skills and Combined_Keywords stored as comma-separated strings).
+        """
         excluded_ids = excluded_ids or []
-        
+
+        # Hard-coded org distance to mirror script semantics
+        org_distance = 2
+
         # Determine null replacement value
         if null_years_option == 1:
             null_replacement = time_threshold + 1
@@ -663,68 +674,174 @@ class ScientificTeamFormation:
             null_replacement = random.randint(0, 30)
         else:
             null_replacement = time_threshold + 1
-    
-        # Determine ORDER BY clause based on sort_order parameter
+
+        # ORDER BY clause based on sort_order
         if sort_order == "recency_first":
-            order_clause = "ORDER BY min_years_passed, citation_count DESC"
-        elif sort_order == "citation_first":
-            order_clause = "ORDER BY citation_count DESC, min_years_passed"
+            order_clause = "ORDER BY min_years_passed ASC, citation_count DESC, min_distance ASC"
         elif sort_order == "distance_citation":
-            order_clause = "ORDER BY min_distance, citation_count DESC, min_years_passed"
-        else:
-            order_clause = "ORDER BY min_distance, min_years_passed, citation_count DESC"
-        
-        query = f"""
-        MATCH (author:Author)
-        WHERE author.skills IS NOT NULL 
+            order_clause = "ORDER BY min_distance ASC, citation_count DESC, min_years_passed ASC"
+        else:  # citation_first (default)
+            order_clause = "ORDER BY citation_count DESC, min_years_passed ASC, min_distance ASC"
+
+        try:
+            # -------------------------
+            # Stage 1: Direct co-authorships (shared recent keyword paper)
+            # -------------------------
+            primary_query = f"""
+            MATCH (team:Author)
+            WHERE team.Author_ID IN $team_ids
+
+            MATCH (author:Author)-[:WRITTEN]->(paper:Paper)<-[:WRITTEN]-(team)
+            WHERE author.skills IS NOT NULL
               AND any(skill IN split(author.skills, ', ') WHERE toLower(skill) CONTAINS toLower($keyword))
               AND NOT author.Author_ID IN $excluded_ids
-        
-        WITH author
-        
-        MATCH (team:Author)
-        WHERE team.Author_ID IN $team_ids
+              AND coalesce(paper.Years_Passed, $null_replacement) <= $time_threshold
+              AND any(kw IN split(paper.Combined_Keywords, ', ') WHERE toLower(kw) CONTAINS toLower($keyword))
 
-        MATCH (author)-[w1:WRITTEN]->(paper:Paper)<-[w2:WRITTEN]-(team)
-        WHERE coalesce(paper.Years_Passed, $null_replacement) <= $time_threshold
-        
-        WITH author, team, paper, 
-             2 AS path_length,
-             coalesce(paper.Years_Passed, $null_replacement) AS years_passed
+            WITH author,
+                 2 AS min_distance,
+                 MIN(coalesce(paper.Years_Passed, $null_replacement)) AS min_years_passed,
+                 SUM(coalesce(paper.n_Citation, 0)) AS citation_count
 
-        WITH author, min(path_length) AS min_distance, min(years_passed) AS min_years_passed
+            {order_clause}
+            LIMIT 1
 
-        OPTIONAL MATCH (author)-[:WRITTEN]->(p:Paper)
-        WHERE any(kw IN split(p.Combined_Keywords, ', ') WHERE toLower(kw) CONTAINS toLower($keyword))
-        WITH author, min_distance, min_years_passed,
-             SUM(coalesce(p.n_Citation, 0)) AS citation_count
-        
-        {order_clause}
-        LIMIT 1
-        
-        RETURN author.Author_ID AS author_id,
-               author.Author_Name AS author_name,
-               author.skills AS skills,
-               citation_count,
-               min_distance AS distance,
-               min_years_passed AS recency
-        """
-        
-        try:
+            RETURN author.Author_ID AS author_id,
+                   author.Author_Name AS author_name,
+                   author.skills AS skills,
+                   citation_count,
+                   min_distance AS distance,
+                   min_years_passed AS recency
+            """
+
             result = tx.run(
-                query,
+                primary_query,
+                team_ids=team_ids,
                 keyword=keyword,
                 excluded_ids=excluded_ids,
-                team_ids=team_ids,
                 time_threshold=time_threshold,
-                null_replacement=null_replacement
+                null_replacement=null_replacement,
             )
             record = result.single()
-            
             if record:
-                logger.debug(f"CIT found author {record['author_name']} with citation count: {record.get('citation_count', 0)}")
-            
-            return dict(record) if record else None
+                out = dict(record)
+                out["selection_source"] = "coauthor"
+                logger.debug(
+                    f"CIT (coauthor) found {out['author_name']} with citations={out.get('citation_count', 0)}"
+                )
+                return out
+
+            # -------------------------
+            # Stage 2: Direct co-working (org_distance = 2)
+            # -------------------------
+            org_query = f"""
+            MATCH (team:Author)
+            WHERE team.Author_ID IN $team_ids
+            WITH COLLECT(team) AS team
+            UNWIND team AS t
+
+            MATCH org_path = (t)-[:WORKS_IN|INCLUDES*1..{org_distance}]-(candidate:Author)
+            WHERE candidate.skills IS NOT NULL
+              AND any(skill IN split(candidate.skills, ', ') WHERE toLower(skill) CONTAINS toLower($keyword))
+              AND NOT candidate.Author_ID IN $excluded_ids
+
+            OPTIONAL MATCH (candidate)-[:WRITTEN]->(p:Paper)
+            WHERE any(kw IN split(p.Combined_Keywords, ', ') WHERE toLower(kw) CONTAINS toLower($keyword))
+              AND coalesce(p.Years_Passed, $null_replacement) <= $time_threshold
+
+            WITH candidate,
+                 MIN(length(org_path)) AS min_distance,
+                 MIN(coalesce(p.Years_Passed, $null_replacement)) AS min_years_passed,
+                 SUM(coalesce(p.n_Citation, 0)) AS citation_count
+
+            // Enforce strict recency and require at least one recent keyword paper
+            WHERE min_years_passed <= $time_threshold AND citation_count > 0
+
+            RETURN candidate.Author_ID AS author_id,
+                   candidate.Author_Name AS author_name,
+                   candidate.skills AS skills,
+                   citation_count,
+                   min_distance AS distance,
+                   min_years_passed AS recency
+
+            ORDER BY citation_count DESC, min_years_passed ASC, min_distance ASC
+            LIMIT 1
+            """
+
+            result = tx.run(
+                org_query,
+                team_ids=team_ids,
+                keyword=keyword,
+                excluded_ids=excluded_ids,
+                time_threshold=time_threshold,
+                null_replacement=null_replacement,
+            )
+            record = result.single()
+            if record:
+                out = dict(record)
+                out["selection_source"] = "org"
+                logger.debug(
+                    f"CIT (org) found {out['author_name']} with citations={out.get('citation_count', 0)}"
+                )
+                return out
+
+            # -------------------------
+            # Stage 3: Any-path shortestPath fallback
+            # -------------------------
+            fallback_query = f"""
+            MATCH (candidate:Author)
+            WHERE candidate.skills IS NOT NULL
+              AND any(skill IN split(candidate.skills, ', ') WHERE toLower(skill) CONTAINS toLower($keyword))
+              AND NOT candidate.Author_ID IN $excluded_ids
+
+            MATCH (tm:Author)
+            WHERE tm.Author_ID IN $team_ids
+
+            MATCH path = shortestPath((candidate)-[*1..{max_distance}]-(tm))
+
+            WITH candidate, MIN(length(path)) AS min_distance
+
+            OPTIONAL MATCH (candidate)-[:WRITTEN]->(p:Paper)
+            WHERE any(kw IN split(p.Combined_Keywords, ', ') WHERE toLower(kw) CONTAINS toLower($keyword))
+              AND coalesce(p.Years_Passed, $null_replacement) <= $time_threshold
+
+            WITH candidate,
+                 min_distance,
+                 SUM(coalesce(p.n_Citation, 0)) AS citation_count,
+                 MIN(coalesce(p.Years_Passed, $null_replacement)) AS min_years_passed
+
+            WHERE citation_count > 0
+
+            RETURN candidate.Author_ID AS author_id,
+                   candidate.Author_Name AS author_name,
+                   candidate.skills AS skills,
+                   citation_count,
+                   min_distance AS distance,
+                   min_years_passed AS recency
+
+            ORDER BY citation_count DESC, min_years_passed ASC, min_distance ASC
+            LIMIT 1
+            """
+
+            result = tx.run(
+                fallback_query,
+                team_ids=team_ids,
+                keyword=keyword,
+                excluded_ids=excluded_ids,
+                time_threshold=time_threshold,
+                null_replacement=null_replacement,
+            )
+            record = result.single()
+            if record:
+                out = dict(record)
+                out["selection_source"] = "fallback"
+                logger.debug(
+                    f"CIT (fallback) found {out['author_name']} with citations={out.get('citation_count', 0)}"
+                )
+                return out
+
+            return None
+
         except Exception as e:
             logger.error(f"Error in find_member_near_team_citation_optimized: {e}")
             return None
