@@ -597,6 +597,9 @@
         <div class="header">
             <h1>🔬 Scientific Team Formation System</h1>
             <p>Advanced algorithms for building optimal research teams using Neo4j database</p>
+            <div style="margin-top: 15px;">
+                <a href="/about" style="color: white; text-decoration: none; background: rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 20px; display: inline-block; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">ℹ️ About ONLEVAL</a>
+            </div>
         </div>
 
         <div class="form-card">
@@ -1363,6 +1366,18 @@
                 </div>
             `;
             
+            // Helper function to process organizations
+            const processOrgs = (orgs) => {
+                if (!orgs || orgs.length === 0) return '';
+                const topThree = orgs.slice(0, 3).map(org => {
+                    const parts = org.split(',');
+                    return parts.slice(0, 2).join(',').trim();
+                });
+                return topThree.map((org, idx) => 
+                    `<span class="org-badge org-color-${idx % 5}">${org}</span>`
+                ).join('');
+            };
+            
             teams.forEach((team, index) => {
                 const members = team.members || [];
                 const completeness = (team.completeness || 0) * 100;
@@ -1424,18 +1439,6 @@
                     const remainingSkills = skillsArray.slice(5);
                     const hasMoreSkills = remainingSkills.length > 0;
                     const memberCardId = `member-${index}-${memberIndex}`;
-                    
-                    // Process organizations: take max 3, crop each after 2nd comma
-                    const processOrgs = (orgs) => {
-                        if (!orgs || orgs.length === 0) return '';
-                        const topThree = orgs.slice(0, 3).map(org => {
-                            const parts = org.split(',');
-                            return parts.slice(0, 2).join(',');
-                        });
-                        return topThree.map((org, idx) => 
-                            `<span class="org-badge org-color-${idx % 5}">${org}</span>`
-                        ).join('');
-                    };
                     
                     html += `
                         <div class="member-card">
