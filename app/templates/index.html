@@ -1044,10 +1044,6 @@
                     <p style="font-size: 14px; margin-bottom: 20px;">Keywords: <strong>${selectedKeywords.join(', ')}</strong></p>
                         </div>
                     </div>
-                    
-                    <p style="font-size: 12px; color: #666; margin-top: 15px;">
-                        🚀 Using background processing to bypass Heroku timeouts
-                    </p>
                 </div>
             `;
             resultsDiv.style.display = 'block';
@@ -1429,10 +1425,24 @@
                     const hasMoreSkills = remainingSkills.length > 0;
                     const memberCardId = `member-${index}-${memberIndex}`;
                     
+                    // Process organizations: take max 3, crop each after 2nd comma
+                    const processOrgs = (orgs) => {
+                        if (!orgs || orgs.length === 0) return '';
+                        const topThree = orgs.slice(0, 3).map(org => {
+                            const parts = org.split(',');
+                            return parts.slice(0, 2).join(',');
+                        });
+                        return topThree.map((org, idx) => 
+                            `<span class="org-badge org-color-${idx % 5}">${org}</span>`
+                        ).join('');
+                    };
+                    
                     html += `
                         <div class="member-card">
                             <div class="member-header">
-                                <h4 class="member-name">👤 ${member.author_name || 'Unknown'}${member.organizations && member.organizations.length > 0 ? ' (' + member.organizations.join(', ') + ')' : ''}</h4>
+                                <h4 class="member-name">👤 ${member.author_name || 'Unknown'}</h4>
+                                ${member.organizations && member.organizations.length > 0 ? 
+                                    `<div class="org-badges">${processOrgs(member.organizations)}</div>` : ''}
                                 <div class="member-stats">
                                     <span class="stat">📄 ${paperCount} papers</span>
                                     <span class="stat" title="${citationTooltip}">📊 ${citationCount} citations</span>

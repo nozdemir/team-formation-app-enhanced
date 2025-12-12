@@ -162,6 +162,29 @@ h1 {
     background-color: #6c757d !important;
 }
 
+/* Organization badges styling */
+.org-badges {
+    margin-top: 5px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.org-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.org-color-0 { background-color: #e3f2fd; color: #1976d2; }
+.org-color-1 { background-color: #f3e5f5; color: #7b1fa2; }
+.org-color-2 { background-color: #e8f5e9; color: #388e3c; }
+.org-color-3 { background-color: #fff3e0; color: #f57c00; }
+.org-color-4 { background-color: #fce4ec; color: #c2185b; }
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .team-card .col-lg-8,
